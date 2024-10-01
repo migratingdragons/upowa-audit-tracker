@@ -3,12 +3,6 @@
   "dependencies": {
   },
   "exceptionLogging": "STACKDRIVER",
-  "runtimeVersion": "V8"
-}{
-  "timeZone": "Your_Timezone",
-  "dependencies": {
-  },
-  "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8",
   "webapp": {
     "executeAs": "USER_DEPLOYING",
