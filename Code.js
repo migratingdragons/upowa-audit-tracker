@@ -50,9 +50,9 @@ function doPost(e) {
 			"Data processed successfully",
 		).setMimeType(ContentService.MimeType.TEXT);
 	} catch (error) {
-		console.error("Error in doPost: " + error.message);
+		console.error(`Error in doPost: ${error.message}`);
 		return ContentService.createTextOutput(
-			"Error: " + error.message,
+			`Error: ${error.message}`,
 		).setMimeType(ContentService.MimeType.TEXT);
 	}
 }
