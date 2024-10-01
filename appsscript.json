@@ -4,4 +4,18 @@
   },
   "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8"
+}{
+  "timeZone": "Your_Timezone",
+  "dependencies": {
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "webapp": {
+    "executeAs": "USER_DEPLOYING",
+    "access": "ANYONE"
+  },
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/script.external_request"
+  ]
 }
