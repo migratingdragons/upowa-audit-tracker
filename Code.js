@@ -4,11 +4,11 @@ const ELECTRICAL_SHEET = "Non-compliant Electrical Installations";
 const RESOLVED_PANEL_SHEET = "Resolved Non-compliant Panel Installations";
 const RESOLVED_ELECTRICAL_SHEET =
 	"Resolved Non-compliant Electrical Installations";
-const TRACKER_SPREADSHEET_ID = "YOUR_SPREADSHEET_ID_HERE"; // Replace with your actual spreadsheet ID
+const TRACKER_SPREADSHEET_ID = "1LbirkFq0sw0ZNLXwhKizZ284gTIeBbzAOqWPQY8Txvw"; // Replace with your actual spreadsheet ID
 
 // Debug and testing constants
-const DEBUG_MODE = false;
-const DEBUG_EMAIL = "your-debug-email@example.com"; // Replace with your debug email
+const DEBUG_MODE = true;
+const DEBUG_EMAIL = "test-debug@tdobson.net"; // Replace with your debug email
 const TESTING_MODE = false;
 const TESTING_DATA = {}; // Replace with your test data object
 
