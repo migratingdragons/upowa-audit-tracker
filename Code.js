@@ -1,4 +1,3 @@
-// Constants for sheet names and string values
 /**
  * Constants for sheet names and string values.
  */
