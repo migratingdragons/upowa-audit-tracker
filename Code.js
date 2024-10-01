@@ -19,8 +19,8 @@ const CONSTANTS = {
 
 // Debug and testing constants
 const DEBUG_MODE = true;
-const TESTING_MODE = false;
-const TESTING_DATA = {}; // Replace with your test data object
+const TESTING_MODE = true;
+const TESTING_DATA = testDataForDoPost
 
 function doPost(e) {
 	try {
