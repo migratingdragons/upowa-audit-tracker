@@ -1,4 +1,3 @@
-function myFunction() {}
 // Constants for sheet names
 const PANEL_SHEET = "Panel";
 const ELECTRICAL_SHEET = "Electrical";
