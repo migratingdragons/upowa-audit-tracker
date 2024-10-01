@@ -34,10 +34,14 @@ function doPost(e) {
 
 		processAndAppendData(jsonData, sheetName);
 
-		return ContentService.createTextOutput("Data processed successfully").setMimeType(ContentService.MimeType.TEXT);
+		return ContentService.createTextOutput(
+			"Data processed successfully",
+		).setMimeType(ContentService.MimeType.TEXT);
 	} catch (error) {
 		console.error("Error in doPost: " + error.message);
-		return ContentService.createTextOutput("Error: " + error.message).setMimeType(ContentService.MimeType.TEXT);
+		return ContentService.createTextOutput(
+			"Error: " + error.message,
+		).setMimeType(ContentService.MimeType.TEXT);
 	}
 }
 
@@ -164,8 +168,5 @@ function testDoPost() {
 }
 
 function createTimeDrivenTrigger() {
-	ScriptApp.newTrigger('moveResolvedRows')
-		.timeBased()
-		.everyHours(1)
-		.create();
+	ScriptApp.newTrigger("moveResolvedRows").timeBased().everyHours(1).create();
 }
