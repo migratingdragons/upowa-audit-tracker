@@ -13,27 +13,32 @@ const TESTING_MODE = false;
 const TESTING_DATA = {}; // Replace with your test data object
 
 function doPost(e) {
-	let jsonData;
+	try {
+		let jsonData;
 
-	if (TESTING_MODE && !e) {
-		jsonData = TESTING_DATA;
-		console.log("Using testing data");
-	} else {
-		jsonData = JSON.parse(e.postData.contents);
+		if (TESTING_MODE && !e) {
+			jsonData = TESTING_DATA;
+			console.log("Using testing data");
+		} else {
+			jsonData = JSON.parse(e.postData.contents);
+		}
+
+		// Debug mode: send email with jsonData
+		if (DEBUG_MODE) {
+			sendDebugEmail(jsonData);
+		}
+
+		// Determine which sheet to use based on the data
+		const sheetName =
+			jsonData.installationType === "panel" ? PANEL_SHEET : ELECTRICAL_SHEET;
+
+		processAndAppendData(jsonData, sheetName);
+
+		return ContentService.createTextOutput("Data processed successfully").setMimeType(ContentService.MimeType.TEXT);
+	} catch (error) {
+		console.error("Error in doPost: " + error.message);
+		return ContentService.createTextOutput("Error: " + error.message).setMimeType(ContentService.MimeType.TEXT);
 	}
-
-	// Debug mode: send email with jsonData
-	if (DEBUG_MODE) {
-		sendDebugEmail(jsonData);
-	}
-
-	// Determine which sheet to use based on the data
-	const sheetName =
-		jsonData.installationType === "panel" ? PANEL_SHEET : ELECTRICAL_SHEET;
-
-	processAndAppendData(jsonData, sheetName);
-
-	return ContentService.createTextOutput("Data processed successfully");
 }
 
 function sendDebugEmail(jsonData) {
@@ -82,6 +87,15 @@ function processAndAppendData(data, sheetName) {
 		headers.push("Comment");
 		sheet.getRange(1, headers.length).setValue("Comment");
 	}
+
+	// Add Timestamp column if it doesn't exist
+	if (!headers.includes("Timestamp")) {
+		headers.push("Timestamp");
+		sheet.getRange(1, headers.length).setValue("Timestamp");
+	}
+
+	// Add current timestamp to the new row
+	newRow[headers.indexOf("Timestamp")] = new Date();
 
 	// Append the new row
 	sheet.appendRow(newRow);
@@ -147,4 +161,11 @@ function testDoPost() {
 			"Testing mode is not enabled. Please enable TESTING_MODE to run this function.",
 		);
 	}
+}
+
+function createTimeDrivenTrigger() {
+	ScriptApp.newTrigger('moveResolvedRows')
+		.timeBased()
+		.everyHours(1)
+		.create();
 }
