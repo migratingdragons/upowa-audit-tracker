@@ -13,7 +13,7 @@ const TESTING_MODE = false;
 const TESTING_DATA = {}; // Replace with your test data object
 
 function doPost(e) {
-	var jsonData;
+	let jsonData;
 
 	if (TESTING_MODE && !e) {
 		jsonData = TESTING_DATA;
@@ -28,7 +28,7 @@ function doPost(e) {
 	}
 
 	// Determine which sheet to use based on the data
-	var sheetName =
+	const sheetName =
 		jsonData.installationType === "panel" ? PANEL_SHEET : ELECTRICAL_SHEET;
 
 	processAndAppendData(jsonData, sheetName);
@@ -37,8 +37,8 @@ function doPost(e) {
 }
 
 function sendDebugEmail(jsonData) {
-	var subject = "Debug Output: Non-compliant Audit Data";
-	var body = "JSON Data for non-compliant audit:\n\n";
+	const subject = "Debug Output: Non-compliant Audit Data";
+	let body = "JSON Data for non-compliant audit:\n\n";
 	body += JSON.stringify(jsonData, null, 2); // Pretty print JSON
 
 	MailApp.sendEmail({
@@ -51,19 +51,19 @@ function sendDebugEmail(jsonData) {
 }
 
 function processAndAppendData(data, sheetName) {
-	var spreadsheet = SpreadsheetApp.openById(TRACKER_SPREADSHEET_ID);
-	var sheet = spreadsheet.getSheetByName(sheetName);
+	const spreadsheet = SpreadsheetApp.openById(TRACKER_SPREADSHEET_ID);
+	let sheet = spreadsheet.getSheetByName(sheetName);
 
 	if (!sheet) {
 		sheet = spreadsheet.insertSheet(sheetName);
 		setupInitialColumns(sheet);
 	}
 
-	var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-	var newRow = [];
+	const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+	const newRow = [];
 
-	for (var key in data) {
-		var columnIndex = headers.indexOf(key);
+	for (const key in data) {
+		let columnIndex = headers.indexOf(key);
 		if (columnIndex === -1) {
 			// Add new column if it doesn't exist
 			headers.push(key);
@@ -97,25 +97,25 @@ function moveResolvedRows() {
 }
 
 function moveResolvedRowsForSheet(sourceSheetName, targetSheetName) {
-	var spreadsheet = SpreadsheetApp.openById(TRACKER_SPREADSHEET_ID);
-	var sourceSheet = spreadsheet.getSheetByName(sourceSheetName);
-	var targetSheet = spreadsheet.getSheetByName(targetSheetName);
+	const spreadsheet = SpreadsheetApp.openById(TRACKER_SPREADSHEET_ID);
+	const sourceSheet = spreadsheet.getSheetByName(sourceSheetName);
+	let targetSheet = spreadsheet.getSheetByName(targetSheetName);
 
 	if (!targetSheet) {
 		targetSheet = spreadsheet.insertSheet(targetSheetName);
 		setupInitialColumns(targetSheet);
 	}
 
-	var data = sourceSheet.getDataRange().getValues();
-	var headers = data.shift();
-	var resolvedIndex = headers.indexOf("Resolved");
+	const data = sourceSheet.getDataRange().getValues();
+	const headers = data.shift();
+	const resolvedIndex = headers.indexOf("Resolved");
 
 	if (resolvedIndex === -1) return; // No Resolved column found
 
-	var rowsToMove = [];
-	var rowsToDelete = [];
+	const rowsToMove = [];
+	const rowsToDelete = [];
 
-	for (var i = data.length - 1; i >= 0; i--) {
+	for (let i = data.length - 1; i >= 0; i--) {
 		if (data[i][resolvedIndex] === true) {
 			rowsToMove.push(data[i]);
 			rowsToDelete.push(i + 2); // +2 because of 0-indexing and header row
@@ -131,7 +131,7 @@ function moveResolvedRowsForSheet(sourceSheetName, targetSheetName) {
 				headers.length,
 			)
 			.setValues(rowsToMove);
-		for (var i = rowsToDelete.length - 1; i >= 0; i--) {
+		for (let i = rowsToDelete.length - 1; i >= 0; i--) {
 			sourceSheet.deleteRow(rowsToDelete[i]);
 		}
 	}
