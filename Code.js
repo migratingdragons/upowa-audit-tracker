@@ -60,68 +60,68 @@ function sendDebugEmail(jsonData) {
 }
 
 function processAndAppendData(data) {
-  const spreadsheet = SpreadsheetApp.openById(TRACKER_SPREADSHEET_ID);
-  
-  // Determine the correct sheet based on Job_Type
-  const jobType = data.answers.Job_Type.value;
-  const sheetName = jobType === "Installation" ? PANEL_SHEET : ELECTRICAL_SHEET;
-  
-  let sheet = spreadsheet.getSheetByName(sheetName);
+	const spreadsheet = SpreadsheetApp.openById(TRACKER_SPREADSHEET_ID);
 
-  if (!sheet) {
-    sheet = spreadsheet.insertSheet(sheetName);
-    setupInitialColumns(sheet);
-  }
+	// Determine the correct sheet based on Job_Type
+	const jobType = data.answers.Job_Type.value;
+	const sheetName = jobType === "Installation" ? PANEL_SHEET : ELECTRICAL_SHEET;
 
-  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  const newRow = [];
+	let sheet = spreadsheet.getSheetByName(sheetName);
 
-  // Process metadata
-  processObject(data.metadata, headers, newRow, "metadata");
+	if (!sheet) {
+		sheet = spreadsheet.insertSheet(sheetName);
+		setupInitialColumns(sheet);
+	}
 
-  // Process answers
-  processObject(data.answers, headers, newRow, "answers");
+	const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+	const newRow = [];
 
-  // Add Timestamp column if it doesn't exist
-  if (!headers.includes("Timestamp")) {
-    headers.push("Timestamp");
-    sheet.getRange(1, headers.length).setValue("Timestamp");
-  }
+	// Process metadata
+	processObject(data.metadata, headers, newRow, "metadata");
 
-  // Add current timestamp to the new row
-  newRow[headers.indexOf("Timestamp")] = new Date();
+	// Process answers
+	processObject(data.answers, headers, newRow, "answers");
 
-  // Ensure "Resolved" and "Comment" columns exist
-  ensureColumnExists(headers, sheet, "Resolved");
-  ensureColumnExists(headers, sheet, "Comment");
+	// Add Timestamp column if it doesn't exist
+	if (!headers.includes("Timestamp")) {
+		headers.push("Timestamp");
+		sheet.getRange(1, headers.length).setValue("Timestamp");
+	}
 
-  // Append the new row
-  sheet.appendRow(newRow);
+	// Add current timestamp to the new row
+	newRow[headers.indexOf("Timestamp")] = new Date();
+
+	// Ensure "Resolved" and "Comment" columns exist
+	ensureColumnExists(headers, sheet, "Resolved");
+	ensureColumnExists(headers, sheet, "Comment");
+
+	// Append the new row
+	sheet.appendRow(newRow);
 }
 
 function processObject(obj, headers, newRow, prefix) {
-  for (const key in obj) {
-    const value = obj[key];
-    if (typeof value === 'object' && value !== null) {
-      processObject(value, headers, newRow, `${prefix}.${key}`);
-    } else {
-      const columnName = `${prefix}.${key}`;
-      let columnIndex = headers.indexOf(columnName);
-      if (columnIndex === -1) {
-        headers.push(columnName);
-        columnIndex = headers.length - 1;
-        sheet.getRange(1, columnIndex + 1).setValue(columnName);
-      }
-      newRow[columnIndex] = value;
-    }
-  }
+	for (const key in obj) {
+		const value = obj[key];
+		if (typeof value === "object" && value !== null) {
+			processObject(value, headers, newRow, `${prefix}.${key}`);
+		} else {
+			const columnName = `${prefix}.${key}`;
+			let columnIndex = headers.indexOf(columnName);
+			if (columnIndex === -1) {
+				headers.push(columnName);
+				columnIndex = headers.length - 1;
+				sheet.getRange(1, columnIndex + 1).setValue(columnName);
+			}
+			newRow[columnIndex] = value;
+		}
+	}
 }
 
 function ensureColumnExists(headers, sheet, columnName) {
-  if (!headers.includes(columnName)) {
-    headers.push(columnName);
-    sheet.getRange(1, headers.length).setValue(columnName);
-  }
+	if (!headers.includes(columnName)) {
+		headers.push(columnName);
+		sheet.getRange(1, headers.length).setValue(columnName);
+	}
 }
 
 function setupInitialColumns(sheet) {
@@ -129,46 +129,48 @@ function setupInitialColumns(sheet) {
 }
 
 function moveResolvedRows() {
-  moveResolvedRowsForSheet(PANEL_SHEET);
-  moveResolvedRowsForSheet(ELECTRICAL_SHEET);
+	moveResolvedRowsForSheet(PANEL_SHEET);
+	moveResolvedRowsForSheet(ELECTRICAL_SHEET);
 }
 
 function moveResolvedRowsForSheet(sourceSheetName) {
-  const spreadsheet = SpreadsheetApp.openById(TRACKER_SPREADSHEET_ID);
-  const sourceSheet = spreadsheet.getSheetByName(sourceSheetName);
-  
-  const data = sourceSheet.getDataRange().getValues();
-  const headers = data.shift();
-  const resolvedIndex = headers.indexOf("Resolved");
-  const jobTypeIndex = headers.indexOf("answers.Job_Type.value");
+	const spreadsheet = SpreadsheetApp.openById(TRACKER_SPREADSHEET_ID);
+	const sourceSheet = spreadsheet.getSheetByName(sourceSheetName);
 
-  if (resolvedIndex === -1 || jobTypeIndex === -1) return; // Required columns not found
+	const data = sourceSheet.getDataRange().getValues();
+	const headers = data.shift();
+	const resolvedIndex = headers.indexOf("Resolved");
+	const jobTypeIndex = headers.indexOf("answers.Job_Type.value");
 
-  const rowsToDelete = [];
+	if (resolvedIndex === -1 || jobTypeIndex === -1) return; // Required columns not found
 
-  for (let i = data.length - 1; i >= 0; i--) {
-    if (data[i][resolvedIndex] === true) {
-      const jobType = data[i][jobTypeIndex];
-      const targetSheetName = getResolvedSheetName(jobType);
-      let targetSheet = spreadsheet.getSheetByName(targetSheetName);
+	const rowsToDelete = [];
 
-      if (!targetSheet) {
-        targetSheet = spreadsheet.insertSheet(targetSheetName);
-        setupInitialColumns(targetSheet);
-      }
+	for (let i = data.length - 1; i >= 0; i--) {
+		if (data[i][resolvedIndex] === true) {
+			const jobType = data[i][jobTypeIndex];
+			const targetSheetName = getResolvedSheetName(jobType);
+			let targetSheet = spreadsheet.getSheetByName(targetSheetName);
 
-      targetSheet.appendRow(data[i]);
-      rowsToDelete.push(i + 2); // +2 because of 0-indexing and header row
-    }
-  }
+			if (!targetSheet) {
+				targetSheet = spreadsheet.insertSheet(targetSheetName);
+				setupInitialColumns(targetSheet);
+			}
 
-  for (let i = rowsToDelete.length - 1; i >= 0; i--) {
-    sourceSheet.deleteRow(rowsToDelete[i]);
-  }
+			targetSheet.appendRow(data[i]);
+			rowsToDelete.push(i + 2); // +2 because of 0-indexing and header row
+		}
+	}
+
+	for (let i = rowsToDelete.length - 1; i >= 0; i--) {
+		sourceSheet.deleteRow(rowsToDelete[i]);
+	}
 }
 
 function getResolvedSheetName(jobType) {
-  return jobType === "Installation" ? RESOLVED_PANEL_SHEET : RESOLVED_ELECTRICAL_SHEET;
+	return jobType === "Installation"
+		? RESOLVED_PANEL_SHEET
+		: RESOLVED_ELECTRICAL_SHEET;
 }
 
 function testDoPost() {
