@@ -22,6 +22,14 @@ const DEBUG_MODE = false;
 const TESTING_MODE = false;
 const TESTING_DATA = testDataForDoPost;
 
+/**
+ * Handles POST requests to process incoming data.
+ * If in testing mode, uses predefined testing data.
+ * Sends debug email if in debug mode.
+ * Determines the appropriate sheet based on the installation type.
+ * Processes and appends the data to the appropriate sheet.
+ * Returns a success message or an error message.
+ */
 function doPost(e) {
 	try {
 		let jsonData;
@@ -57,6 +65,10 @@ function doPost(e) {
 	}
 }
 
+/**
+ * Sends a debug email containing the JSON data of a non-compliant audit.
+ * The email includes a pretty-printed version of the JSON data.
+ */
 function sendDebugEmail(jsonData) {
 	const subject = "Debug Output: Non-compliant Audit Data";
 	let body = "JSON Data for non-compliant audit:\n\n";
@@ -71,6 +83,13 @@ function sendDebugEmail(jsonData) {
 	console.log("Debug email sent");
 }
 
+/**
+ * Processes and appends incoming data to the appropriate sheet.
+ * Determines the correct sheet based on the job type.
+ * Sets up initial columns if the sheet does not exist.
+ * Processes metadata and answers, ensuring necessary columns exist.
+ * Appends the new row with the processed data and adds a checkbox to the "Resolved" column.
+ */
 function processAndAppendData(data) {
 	const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
 
@@ -124,6 +143,10 @@ function processAndAppendData(data) {
 	}
 }
 
+/**
+ * Recursively processes an object and appends its key-value pairs to the new row.
+ * Ensures that all necessary columns exist in the sheet.
+ */
 function processObject(obj, headers, newRow, prefix, sheet) {
 	for (const key in obj) {
 		const value = obj[key];
@@ -142,6 +165,10 @@ function processObject(obj, headers, newRow, prefix, sheet) {
 	}
 }
 
+/**
+ * Ensures that a specific column exists in the sheet.
+ * If the column does not exist, it is added to the headers and the sheet.
+ */
 function ensureColumnExists(headers, sheet, columnName) {
 	if (!headers.includes(columnName)) {
 		headers.push(columnName);
@@ -149,6 +176,10 @@ function ensureColumnExists(headers, sheet, columnName) {
 	}
 }
 
+/**
+ * Sets up the initial columns in a new sheet.
+ * Adds the "Resolved", "Comment", and "Timestamp" columns.
+ */
 function setupInitialColumns(sheet) {
 	sheet
 		.getRange(1, 1, 1, 3)
@@ -161,6 +192,11 @@ function setupInitialColumns(sheet) {
 		]);
 }
 
+/**
+ * Moves resolved rows from the source sheets to the resolved sheets.
+ * Uses a document lock to ensure no conflicts with other processes.
+ * Moves resolved rows for both panel and electrical sheets.
+ */
 function moveResolvedRows() {
 	const lock = LockService.getDocumentLock();
 	try {
@@ -181,6 +217,11 @@ function moveResolvedRows() {
 	}
 }
 
+/**
+ * Moves resolved rows from a source sheet to the corresponding resolved sheet.
+ * Determines the target sheet based on the job type.
+ * Appends resolved rows to the target sheet and deletes them from the source sheet.
+ */
 function moveResolvedRowsForSheet(sourceSheetName) {
 	const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
 	const sourceSheet = spreadsheet.getSheetByName(sourceSheetName);
@@ -215,12 +256,20 @@ function moveResolvedRowsForSheet(sourceSheetName) {
 	}
 }
 
+/**
+ * Determines the name of the resolved sheet based on the job type.
+ * Returns the appropriate resolved sheet name.
+ */
 function getResolvedSheetName(jobType) {
 	return jobType === CONSTANTS.JOB_TYPE.INSTALLATION
 		? CONSTANTS.RESOLVED_PANEL_SHEET
 		: CONSTANTS.RESOLVED_ELECTRICAL_SHEET;
 }
 
+/**
+ * Tests the doPost function by executing it with predefined testing data.
+ * Logs the start and completion of the test execution.
+ */
 function testDoPost() {
 	if (TESTING_MODE) {
 		console.log("Starting test execution of doPost");
