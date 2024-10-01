@@ -1,5 +1,5 @@
 {
-  "name": "qms-audit-project",
+  "name": "upowa-audit-tracker",
   "version": "1.0.0",
   "description": "A Google Apps Script to document qms layout and functionality.",
   "scripts": {
@@ -14,17 +14,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tdobson/qms-audit-project.git"
+    "url": "git+https://github.com/migratingdragons/upowa-audit-tracker.git"
   },
   "author": "Tim Dobson",
   "license": "All Rights Reserved",
   "bugs": {
-    "url": "https://github.com/tdobson/qms-audit-project/issues"
+    "url": "https://github.com/migratingdragons/upowa-audit-tracker/issues"
   },
-  "homepage": "https://github.com/tdobson/qms-audit-project#readme",
+  "homepage": "https://github.com/migratingdragons/upowa-audit-tracker#readme",
   "dependencies": {
     "@types/google-apps-script": "^1.0.56",
-    "clasp": "^1.0.0"
+    "clasp": "^1.0.0",
+    "eslint": "^9.11.1"
   },
   "devDependencies": {
     "@google/clasp": "^2.4.2"
