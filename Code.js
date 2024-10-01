@@ -51,12 +51,6 @@ function doPost(e) {
 			sendDebugEmail(jsonData);
 		}
 
-		// Determine which sheet to use based on the data
-		const sheetName =
-			jsonData.installationType === "panel"
-				? CONSTANTS.PANEL_SHEET
-				: CONSTANTS.ELECTRICAL_SHEET;
-
 		processAndAppendData(jsonData);
 
 		return ContentService.createTextOutput(
