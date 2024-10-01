@@ -173,7 +173,7 @@ function moveResolvedRows() {
 			console.log("Could not obtain lock after 30 seconds.");
 		}
 	} catch (e) {
-		console.error("Error in moveResolvedRows: " + e.toString());
+		console.error(`Error in moveResolvedRows: ${e.toString()}`);
 	} finally {
 		if (lock.hasLock()) {
 			lock.releaseLock();
