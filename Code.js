@@ -1,14 +1,24 @@
-// Constants for sheet names
-const PANEL_SHEET = "Non-compliant Panel Installations";
-const ELECTRICAL_SHEET = "Non-compliant Electrical Installations";
-const RESOLVED_PANEL_SHEET = "Resolved Non-compliant Panel Installations";
-const RESOLVED_ELECTRICAL_SHEET =
-	"Resolved Non-compliant Electrical Installations";
-const TRACKER_SPREADSHEET_ID = "1LbirkFq0sw0ZNLXwhKizZ284gTIeBbzAOqWPQY8Txvw"; // Replace with your actual spreadsheet ID
+// Constants for sheet names and string values
+const CONSTANTS = {
+  PANEL_SHEET: "Non-compliant Panel Installations",
+  ELECTRICAL_SHEET: "Non-compliant Electrical Installations",
+  RESOLVED_PANEL_SHEET: "Resolved Non-compliant Panel Installations",
+  RESOLVED_ELECTRICAL_SHEET: "Resolved Non-compliant Electrical Installations",
+  TRACKER_SPREADSHEET_ID: "1LbirkFq0sw0ZNLXwhKizZ284gTIeBbzAOqWPQY8Txvw", // Replace with your actual spreadsheet ID
+  DEBUG_EMAIL: "test-debug@tdobson.net", // Replace with your debug email
+  JOB_TYPE: {
+    INSTALLATION: "Installation"
+  },
+  COLUMN_NAMES: {
+    RESOLVED: "Resolved",
+    COMMENT: "Comment",
+    TIMESTAMP: "Timestamp",
+    JOB_TYPE: "answers.Job_Type.value"
+  }
+};
 
 // Debug and testing constants
 const DEBUG_MODE = true;
-const DEBUG_EMAIL = "test-debug@tdobson.net"; // Replace with your debug email
 const TESTING_MODE = false;
 const TESTING_DATA = {}; // Replace with your test data object
 
@@ -46,57 +56,57 @@ function doPost(e) {
 }
 
 function sendDebugEmail(jsonData) {
-	const subject = "Debug Output: Non-compliant Audit Data";
-	let body = "JSON Data for non-compliant audit:\n\n";
-	body += JSON.stringify(jsonData, null, 2); // Pretty print JSON
+  const subject = "Debug Output: Non-compliant Audit Data";
+  let body = "JSON Data for non-compliant audit:\n\n";
+  body += JSON.stringify(jsonData, null, 2); // Pretty print JSON
 
-	MailApp.sendEmail({
-		to: DEBUG_EMAIL,
-		subject: subject,
-		body: body,
-	});
+  MailApp.sendEmail({
+    to: CONSTANTS.DEBUG_EMAIL,
+    subject: subject,
+    body: body,
+  });
 
-	console.log("Debug email sent");
+  console.log("Debug email sent");
 }
 
 function processAndAppendData(data) {
-	const spreadsheet = SpreadsheetApp.openById(TRACKER_SPREADSHEET_ID);
+  const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
 
-	// Determine the correct sheet based on Job_Type
-	const jobType = data.answers.Job_Type.value;
-	const sheetName = jobType === "Installation" ? PANEL_SHEET : ELECTRICAL_SHEET;
+  // Determine the correct sheet based on Job_Type
+  const jobType = data.answers.Job_Type.value;
+  const sheetName = jobType === CONSTANTS.JOB_TYPE.INSTALLATION ? CONSTANTS.PANEL_SHEET : CONSTANTS.ELECTRICAL_SHEET;
 
-	let sheet = spreadsheet.getSheetByName(sheetName);
+  let sheet = spreadsheet.getSheetByName(sheetName);
 
-	if (!sheet) {
-		sheet = spreadsheet.insertSheet(sheetName);
-		setupInitialColumns(sheet);
-	}
+  if (!sheet) {
+    sheet = spreadsheet.insertSheet(sheetName);
+    setupInitialColumns(sheet);
+  }
 
-	const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-	const newRow = [];
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const newRow = [];
 
-	// Process metadata
-	processObject(data.metadata, headers, newRow, "metadata");
+  // Process metadata
+  processObject(data.metadata, headers, newRow, "metadata");
 
-	// Process answers
-	processObject(data.answers, headers, newRow, "answers");
+  // Process answers
+  processObject(data.answers, headers, newRow, "answers");
 
-	// Add Timestamp column if it doesn't exist
-	if (!headers.includes("Timestamp")) {
-		headers.push("Timestamp");
-		sheet.getRange(1, headers.length).setValue("Timestamp");
-	}
+  // Add Timestamp column if it doesn't exist
+  if (!headers.includes(CONSTANTS.COLUMN_NAMES.TIMESTAMP)) {
+    headers.push(CONSTANTS.COLUMN_NAMES.TIMESTAMP);
+    sheet.getRange(1, headers.length).setValue(CONSTANTS.COLUMN_NAMES.TIMESTAMP);
+  }
 
-	// Add current timestamp to the new row
-	newRow[headers.indexOf("Timestamp")] = new Date();
+  // Add current timestamp to the new row
+  newRow[headers.indexOf(CONSTANTS.COLUMN_NAMES.TIMESTAMP)] = new Date();
 
-	// Ensure "Resolved" and "Comment" columns exist
-	ensureColumnExists(headers, sheet, "Resolved");
-	ensureColumnExists(headers, sheet, "Comment");
+  // Ensure "Resolved" and "Comment" columns exist
+  ensureColumnExists(headers, sheet, CONSTANTS.COLUMN_NAMES.RESOLVED);
+  ensureColumnExists(headers, sheet, CONSTANTS.COLUMN_NAMES.COMMENT);
 
-	// Append the new row
-	sheet.appendRow(newRow);
+  // Append the new row
+  sheet.appendRow(newRow);
 }
 
 function processObject(obj, headers, newRow, prefix) {
@@ -125,52 +135,52 @@ function ensureColumnExists(headers, sheet, columnName) {
 }
 
 function setupInitialColumns(sheet) {
-	sheet.getRange(1, 1, 1, 3).setValues([["Resolved", "Comment", "Timestamp"]]);
+  sheet.getRange(1, 1, 1, 3).setValues([[CONSTANTS.COLUMN_NAMES.RESOLVED, CONSTANTS.COLUMN_NAMES.COMMENT, CONSTANTS.COLUMN_NAMES.TIMESTAMP]]);
 }
 
 function moveResolvedRows() {
-	moveResolvedRowsForSheet(PANEL_SHEET);
-	moveResolvedRowsForSheet(ELECTRICAL_SHEET);
+  moveResolvedRowsForSheet(CONSTANTS.PANEL_SHEET);
+  moveResolvedRowsForSheet(CONSTANTS.ELECTRICAL_SHEET);
 }
 
 function moveResolvedRowsForSheet(sourceSheetName) {
-	const spreadsheet = SpreadsheetApp.openById(TRACKER_SPREADSHEET_ID);
-	const sourceSheet = spreadsheet.getSheetByName(sourceSheetName);
+  const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
+  const sourceSheet = spreadsheet.getSheetByName(sourceSheetName);
 
-	const data = sourceSheet.getDataRange().getValues();
-	const headers = data.shift();
-	const resolvedIndex = headers.indexOf("Resolved");
-	const jobTypeIndex = headers.indexOf("answers.Job_Type.value");
+  const data = sourceSheet.getDataRange().getValues();
+  const headers = data.shift();
+  const resolvedIndex = headers.indexOf(CONSTANTS.COLUMN_NAMES.RESOLVED);
+  const jobTypeIndex = headers.indexOf(CONSTANTS.COLUMN_NAMES.JOB_TYPE);
 
-	if (resolvedIndex === -1 || jobTypeIndex === -1) return; // Required columns not found
+  if (resolvedIndex === -1 || jobTypeIndex === -1) return; // Required columns not found
 
-	const rowsToDelete = [];
+  const rowsToDelete = [];
 
-	for (let i = data.length - 1; i >= 0; i--) {
-		if (data[i][resolvedIndex] === true) {
-			const jobType = data[i][jobTypeIndex];
-			const targetSheetName = getResolvedSheetName(jobType);
-			let targetSheet = spreadsheet.getSheetByName(targetSheetName);
+  for (let i = data.length - 1; i >= 0; i--) {
+    if (data[i][resolvedIndex] === true) {
+      const jobType = data[i][jobTypeIndex];
+      const targetSheetName = getResolvedSheetName(jobType);
+      let targetSheet = spreadsheet.getSheetByName(targetSheetName);
 
-			if (!targetSheet) {
-				targetSheet = spreadsheet.insertSheet(targetSheetName);
-				setupInitialColumns(targetSheet);
-			}
+      if (!targetSheet) {
+        targetSheet = spreadsheet.insertSheet(targetSheetName);
+        setupInitialColumns(targetSheet);
+      }
 
-			targetSheet.appendRow(data[i]);
-			rowsToDelete.push(i + 2); // +2 because of 0-indexing and header row
-		}
-	}
+      targetSheet.appendRow(data[i]);
+      rowsToDelete.push(i + 2); // +2 because of 0-indexing and header row
+    }
+  }
 
-	for (let i = rowsToDelete.length - 1; i >= 0; i--) {
-		sourceSheet.deleteRow(rowsToDelete[i]);
-	}
+  for (let i = rowsToDelete.length - 1; i >= 0; i--) {
+    sourceSheet.deleteRow(rowsToDelete[i]);
+  }
 }
 
 function getResolvedSheetName(jobType) {
-	return jobType === "Installation"
-		? RESOLVED_PANEL_SHEET
-		: RESOLVED_ELECTRICAL_SHEET;
+  return jobType === CONSTANTS.JOB_TYPE.INSTALLATION
+    ? CONSTANTS.RESOLVED_PANEL_SHEET
+    : CONSTANTS.RESOLVED_ELECTRICAL_SHEET;
 }
 
 function testDoPost() {
