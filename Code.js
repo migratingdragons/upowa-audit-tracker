@@ -162,8 +162,23 @@ function setupInitialColumns(sheet) {
 }
 
 function moveResolvedRows() {
-	moveResolvedRowsForSheet(CONSTANTS.PANEL_SHEET);
-	moveResolvedRowsForSheet(CONSTANTS.ELECTRICAL_SHEET);
+  const lock = LockService.getDocumentLock();
+  try {
+    lock.waitLock(30000); // wait 30 seconds for other processes to finish.
+    
+    if (lock.hasLock()) {
+      moveResolvedRowsForSheet(CONSTANTS.PANEL_SHEET);
+      moveResolvedRowsForSheet(CONSTANTS.ELECTRICAL_SHEET);
+    } else {
+      console.log('Could not obtain lock after 30 seconds.');
+    }
+  } catch (e) {
+    console.error('Error in moveResolvedRows: ' + e.toString());
+  } finally {
+    if (lock.hasLock()) {
+      lock.releaseLock();
+    }
+  }
 }
 
 function moveResolvedRowsForSheet(sourceSheetName) {
