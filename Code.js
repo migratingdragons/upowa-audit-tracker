@@ -114,6 +114,13 @@ function processAndAppendData(data) {
 
 	// Append the new row
 	sheet.appendRow(newRow);
+	
+	// Add checkbox to the "Resolved" column
+	const resolvedColumnIndex = headers.indexOf(CONSTANTS.COLUMN_NAMES.RESOLVED) + 1;
+	if (resolvedColumnIndex > 0) {
+		const lastRow = sheet.getLastRow();
+		sheet.getRange(lastRow, resolvedColumnIndex).insertCheckboxes();
+	}
 }
 
 function processObject(obj, headers, newRow, prefix, sheet) {
@@ -210,6 +217,3 @@ function testDoPost() {
 	}
 }
 
-function createTimeDrivenTrigger() {
-	ScriptApp.newTrigger("moveResolvedRows").timeBased().everyHours(1).create();
-}
