@@ -1,5 +1,5 @@
 function onOpen() {
-	var ui = SpreadsheetApp.getUi();
+	const ui = SpreadsheetApp.getUi();
 	ui.createMenu("Audit Tools")
 		.addItem("Process Resolved Audits", "processResolvedAudits")
 		.addToUi();
