@@ -20,7 +20,7 @@ const CONSTANTS = {
 // Debug and testing constants
 const DEBUG_MODE = true;
 const TESTING_MODE = true;
-const TESTING_DATA = testDataForDoPost
+const TESTING_DATA = testDataForDoPost;
 
 function doPost(e) {
 	try {
@@ -40,7 +40,7 @@ function doPost(e) {
 
 		// Determine which sheet to use based on the data
 		const sheetName =
-			jsonData.installationType === "panel" ? PANEL_SHEET : ELECTRICAL_SHEET;
+			jsonData.installationType === "panel" ? CONSTANTS.PANEL_SHEET : CONSTANTS.ELECTRICAL_SHEET;
 
 		processAndAppendData(jsonData);
 
