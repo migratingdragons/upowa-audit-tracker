@@ -92,10 +92,10 @@ function processAndAppendData(data) {
 	const newRow = [];
 
 	// Process metadata
-	processObject(data.metadata, headers, newRow, "metadata");
+	processObject(data.metadata, headers, newRow, "metadata", sheet);
 
 	// Process answers
-	processObject(data.answers, headers, newRow, "answers");
+	processObject(data.answers, headers, newRow, "answers", sheet);
 
 	// Add Timestamp column if it doesn't exist
 	if (!headers.includes(CONSTANTS.COLUMN_NAMES.TIMESTAMP)) {
@@ -116,11 +116,11 @@ function processAndAppendData(data) {
 	sheet.appendRow(newRow);
 }
 
-function processObject(obj, headers, newRow, prefix) {
+function processObject(obj, headers, newRow, prefix, sheet) {
 	for (const key in obj) {
 		const value = obj[key];
 		if (typeof value === "object" && value !== null) {
-			processObject(value, headers, newRow, `${prefix}.${key}`);
+			processObject(value, headers, newRow, `${prefix}.${key}`, sheet);
 		} else {
 			const columnName = `${prefix}.${key}`;
 			let columnIndex = headers.indexOf(columnName);
