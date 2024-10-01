@@ -1,4 +1,7 @@
 // Constants for sheet names and string values
+/**
+ * Constants for sheet names and string values.
+ */
 const CONSTANTS = {
 	PANEL_SHEET: "Non-compliant Panel Installations",
 	ELECTRICAL_SHEET: "Non-compliant Electrical Installations",
@@ -17,7 +20,9 @@ const CONSTANTS = {
 	},
 };
 
-// Debug and testing constants
+/**
+ * Debug and testing constants.
+ */
 const DEBUG_MODE = false;
 const TESTING_MODE = false;
 const TESTING_DATA = testDataForDoPost;
