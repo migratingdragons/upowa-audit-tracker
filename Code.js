@@ -221,49 +221,49 @@ function moveResolvedRows() {
  * Appends resolved rows to the target sheet and deletes them from the source sheet.
  */
 function moveResolvedRowsForSheet(sourceSheetName) {
-  const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
-  const sourceSheet = spreadsheet.getSheetByName(sourceSheetName);
+	const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
+	const sourceSheet = spreadsheet.getSheetByName(sourceSheetName);
 
-  const data = sourceSheet.getDataRange().getValues();
-  const headers = data.shift();
-  const resolvedIndex = headers.indexOf(CONSTANTS.COLUMN_NAMES.RESOLVED);
-  const jobTypeIndex = headers.indexOf(CONSTANTS.COLUMN_NAMES.JOB_TYPE);
+	const data = sourceSheet.getDataRange().getValues();
+	const headers = data.shift();
+	const resolvedIndex = headers.indexOf(CONSTANTS.COLUMN_NAMES.RESOLVED);
+	const jobTypeIndex = headers.indexOf(CONSTANTS.COLUMN_NAMES.JOB_TYPE);
 
-  if (resolvedIndex === -1 || jobTypeIndex === -1) return; // Required columns not found
+	if (resolvedIndex === -1 || jobTypeIndex === -1) return; // Required columns not found
 
-  const rowsToMove = [];
+	const rowsToMove = [];
 
-  // Collect all resolved rows
-  for (let i = 0; i < data.length; i++) {
-    if (data[i][resolvedIndex] === true) {
-      rowsToMove.push({
-        rowIndex: i + 2, // +2 because of 0-indexing and header row
-        data: data[i],
-        jobType: data[i][jobTypeIndex]
-      });
-    }
-  }
+	// Collect all resolved rows
+	for (let i = 0; i < data.length; i++) {
+		if (data[i][resolvedIndex] === true) {
+			rowsToMove.push({
+				rowIndex: i + 2, // +2 because of 0-indexing and header row
+				data: data[i],
+				jobType: data[i][jobTypeIndex],
+			});
+		}
+	}
 
-  // Sort rowsToMove by rowIndex in descending order
-  rowsToMove.sort((a, b) => b.rowIndex - a.rowIndex);
+	// Sort rowsToMove by rowIndex in descending order
+	rowsToMove.sort((a, b) => b.rowIndex - a.rowIndex);
 
-  // Move rows to target sheets and delete from source sheet
-  for (const row of rowsToMove) {
-    const targetSheetName = getResolvedSheetName(row.jobType);
-    let targetSheet = spreadsheet.getSheetByName(targetSheetName);
+	// Move rows to target sheets and delete from source sheet
+	for (const row of rowsToMove) {
+		const targetSheetName = getResolvedSheetName(row.jobType);
+		let targetSheet = spreadsheet.getSheetByName(targetSheetName);
 
-    if (!targetSheet) {
-      targetSheet = spreadsheet.insertSheet(targetSheetName);
-      setupInitialColumns(targetSheet);
-    }
+		if (!targetSheet) {
+			targetSheet = spreadsheet.insertSheet(targetSheetName);
+			setupInitialColumns(targetSheet);
+		}
 
-    // Insert at the top of the target sheet (after headers)
-    targetSheet.insertRowAfter(1);
-    targetSheet.getRange(2, 1, 1, row.data.length).setValues([row.data]);
+		// Insert at the top of the target sheet (after headers)
+		targetSheet.insertRowAfter(1);
+		targetSheet.getRange(2, 1, 1, row.data.length).setValues([row.data]);
 
-    // Delete from source sheet
-    sourceSheet.deleteRow(row.rowIndex);
-  }
+		// Delete from source sheet
+		sourceSheet.deleteRow(row.rowIndex);
+	}
 }
 
 /**
