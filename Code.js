@@ -6,10 +6,12 @@ const CONSTANTS = {
 	ELECTRICAL_SHEET: "Non-compliant Electrical Installations",
 	RESOLVED_PANEL_SHEET: "Resolved Non-compliant Panel Installations",
 	RESOLVED_ELECTRICAL_SHEET: "Resolved Non-compliant Electrical Installations",
+	SUMMARY_SHEET: "Summary",
 	TRACKER_SPREADSHEET_ID: "1LbirkFq0sw0ZNLXwhKizZ284gTIeBbzAOqWPQY8Txvw", // Replace with your actual spreadsheet ID
 	DEBUG_EMAIL: "test-debug@tdobson.net", // Replace with your debug email
 	JOB_TYPE: {
 		INSTALLATION: "Installation",
+		ELECTRICAL: "Electrical",
 	},
 	COLUMN_NAMES: {
 		RESOLVED: "Resolved",
@@ -17,6 +19,12 @@ const CONSTANTS = {
 		TIMESTAMP: "Timestamp",
 		JOB_TYPE: "answers.Job_Type.value",
 	},
+	SUMMARY_COLUMNS: [
+		"Audit_Date", "Install_date", "Auditor", "Job_Type", "Installer", "Compliant",
+		"Non_Compliance.Reason", "Non_Compliance.Severity", "Site", "Job_No", "Plot_No",
+		"Team", "Audit_Type", "Authorised_for_NC", "Remedial_Required", "Remedial_Details",
+		"Notes", "submissionid"
+	],
 };
 
 /**
@@ -51,6 +59,7 @@ function doPost(e) {
 		}
 
 		processAndAppendData(jsonData);
+		appendToSummarySheet(jsonData);
 
 		return ContentService.createTextOutput(
 			"Data processed successfully",
@@ -61,6 +70,61 @@ function doPost(e) {
 			`Error: ${error.message}`,
 		).setMimeType(ContentService.MimeType.TEXT);
 	}
+}
+
+function appendToSummarySheet(data) {
+	const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
+	let summarySheet = spreadsheet.getSheetByName(CONSTANTS.SUMMARY_SHEET);
+
+	if (!summarySheet) {
+		summarySheet = spreadsheet.insertSheet(CONSTANTS.SUMMARY_SHEET);
+		summarySheet.appendRow(CONSTANTS.SUMMARY_COLUMNS);
+	}
+
+	const newRow = CONSTANTS.SUMMARY_COLUMNS.map(column => {
+		switch (column) {
+			case "Audit_Date":
+				return data.answers.Audit_Date?.value || "";
+			case "Install_date":
+				return data.answers.Install_date?.value || "";
+			case "Auditor":
+				return data.answers.Auditor?.value || "";
+			case "Job_Type":
+				return data.answers.Job_Type?.value || "";
+			case "Installer":
+				return data.answers.Installer?.value || "";
+			case "Compliant":
+				return data.answers.Compliant?.value ? "yes" : "no";
+			case "Non_Compliance.Reason":
+				return data.answers.Non_Compliance?.values[0]?.Reason?.value || "";
+			case "Non_Compliance.Severity":
+				return data.answers.Non_Compliance?.values[0]?.Severity?.value || "";
+			case "Site":
+				return data.answers.Site?.value || "";
+			case "Job_No":
+				return data.answers.Job_No?.value || "";
+			case "Plot_No":
+				return data.answers.Plot_No?.value || "";
+			case "Team":
+				return ""; // This field is not present in the provided data
+			case "Audit_Type":
+				return data.answers.Audit_Type?.value || "";
+			case "Authorised_for_NC":
+				return data.answers.Authorised_for_NC?.value || "";
+			case "Remedial_Required":
+				return data.answers.Remedial_Required?.value ? "yes" : "no";
+			case "Remedial_Details":
+				return data.answers.Remedial_Details?.value || "";
+			case "Notes":
+				return data.answers.Notes?.value || "";
+			case "submissionid":
+				return data.metadata.submission_id || "";
+			default:
+				return "";
+		}
+	});
+
+	summarySheet.appendRow(newRow);
 }
 
 /**
