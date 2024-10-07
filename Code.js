@@ -196,29 +196,29 @@ function setupInitialColumns(sheet) {
  * Moves resolved rows for both panel and electrical sheets.
  */
 function moveResolvedRows() {
-    const lock = LockService.getDocumentLock();
-    let output = [];
-    try {
-        lock.waitLock(30000); // wait 30 seconds for other processes to finish.
+	const lock = LockService.getDocumentLock();
+	const output = [];
+	try {
+		lock.waitLock(30000); // wait 30 seconds for other processes to finish.
 
-        if (lock.hasLock()) {
-            output.push("Lock obtained successfully");
-            output.push("Processing Panel Sheet:");
-            moveResolvedRowsForSheet(CONSTANTS.PANEL_SHEET);
-            output.push("Processing Electrical Sheet:");
-            moveResolvedRowsForSheet(CONSTANTS.ELECTRICAL_SHEET);
-        } else {
-            output.push("Could not obtain lock after 30 seconds.");
-        }
-    } catch (e) {
-        output.push(`Error in moveResolvedRows: ${e.toString()}`);
-    } finally {
-        if (lock.hasLock()) {
-            lock.releaseLock();
-            output.push("Lock released");
-        }
-    }
-    return output.join('\n');
+		if (lock.hasLock()) {
+			output.push("Lock obtained successfully");
+			output.push("Processing Panel Sheet:");
+			moveResolvedRowsForSheet(CONSTANTS.PANEL_SHEET);
+			output.push("Processing Electrical Sheet:");
+			moveResolvedRowsForSheet(CONSTANTS.ELECTRICAL_SHEET);
+		} else {
+			output.push("Could not obtain lock after 30 seconds.");
+		}
+	} catch (e) {
+		output.push(`Error in moveResolvedRows: ${e.toString()}`);
+	} finally {
+		if (lock.hasLock()) {
+			lock.releaseLock();
+			output.push("Lock released");
+		}
+	}
+	return output.join("\n");
 }
 
 /**
@@ -227,55 +227,57 @@ function moveResolvedRows() {
  * Appends resolved rows to the target sheet and deletes them from the source sheet.
  */
 function moveResolvedRowsForSheet(sourceSheetName) {
-    console.log(`Starting to process sheet: ${sourceSheetName}`);
-    const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
-    const sourceSheet = spreadsheet.getSheetByName(sourceSheetName);
+	console.log(`Starting to process sheet: ${sourceSheetName}`);
+	const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
+	const sourceSheet = spreadsheet.getSheetByName(sourceSheetName);
 
-    const data = sourceSheet.getDataRange().getValues();
-    const headers = data.shift();
-    const resolvedIndex = headers.indexOf(CONSTANTS.COLUMN_NAMES.RESOLVED);
-    const jobTypeIndex = headers.indexOf(CONSTANTS.COLUMN_NAMES.JOB_TYPE);
+	const data = sourceSheet.getDataRange().getValues();
+	const headers = data.shift();
+	const resolvedIndex = headers.indexOf(CONSTANTS.COLUMN_NAMES.RESOLVED);
+	const jobTypeIndex = headers.indexOf(CONSTANTS.COLUMN_NAMES.JOB_TYPE);
 
-    console.log(`Resolved column index: ${resolvedIndex}, Job Type column index: ${jobTypeIndex}`);
+	console.log(
+		`Resolved column index: ${resolvedIndex}, Job Type column index: ${jobTypeIndex}`,
+	);
 
-    if (resolvedIndex === -1 || jobTypeIndex === -1) {
-        console.log("Required columns not found. Exiting function.");
-        return;
-    }
+	if (resolvedIndex === -1 || jobTypeIndex === -1) {
+		console.log("Required columns not found. Exiting function.");
+		return;
+	}
 
-    let rowsProcessed = 0;
-    let rowsMoved = 0;
+	let rowsProcessed = 0;
+	let rowsMoved = 0;
 
-    // Process rows in reverse order to avoid issues with changing indices
-    for (let i = data.length - 1; i >= 0; i--) {
-        rowsProcessed++;
-        if (data[i][resolvedIndex] === true) {
-            console.log(`Found resolved row at index ${i}`);
-            const rowIndex = i + 2; // +2 because of 0-indexing and header row
-            const jobType = data[i][jobTypeIndex];
-            const targetSheetName = getResolvedSheetName(jobType);
+	// Process rows in reverse order to avoid issues with changing indices
+	for (let i = data.length - 1; i >= 0; i--) {
+		rowsProcessed++;
+		if (data[i][resolvedIndex] === true) {
+			console.log(`Found resolved row at index ${i}`);
+			const rowIndex = i + 2; // +2 because of 0-indexing and header row
+			const jobType = data[i][jobTypeIndex];
+			const targetSheetName = getResolvedSheetName(jobType);
 
-            console.log(`Moving row ${rowIndex} to ${targetSheetName}`);
+			console.log(`Moving row ${rowIndex} to ${targetSheetName}`);
 
-            let targetSheet = spreadsheet.getSheetByName(targetSheetName);
-            if (!targetSheet) {
-                console.log(`Creating new sheet: ${targetSheetName}`);
-                targetSheet = spreadsheet.insertSheet(targetSheetName);
-                setupInitialColumns(targetSheet);
-            }
+			let targetSheet = spreadsheet.getSheetByName(targetSheetName);
+			if (!targetSheet) {
+				console.log(`Creating new sheet: ${targetSheetName}`);
+				targetSheet = spreadsheet.insertSheet(targetSheetName);
+				setupInitialColumns(targetSheet);
+			}
 
-            // Insert at the top of the target sheet (after headers)
-            targetSheet.insertRowAfter(1);
-            targetSheet.getRange(2, 1, 1, data[i].length).setValues([data[i]]);
+			// Insert at the top of the target sheet (after headers)
+			targetSheet.insertRowAfter(1);
+			targetSheet.getRange(2, 1, 1, data[i].length).setValues([data[i]]);
 
-            // Delete from source sheet
-            sourceSheet.deleteRow(rowIndex);
-            rowsMoved++;
-        }
-    }
+			// Delete from source sheet
+			sourceSheet.deleteRow(rowIndex);
+			rowsMoved++;
+		}
+	}
 
-    console.log(`Finished processing ${sourceSheetName}`);
-    console.log(`Rows processed: ${rowsProcessed}, Rows moved: ${rowsMoved}`);
+	console.log(`Finished processing ${sourceSheetName}`);
+	console.log(`Rows processed: ${rowsProcessed}, Rows moved: ${rowsMoved}`);
 }
 
 /**
