@@ -10,7 +10,9 @@ function processResolvedAudits() {
 	const output = moveResolvedRows();
 	console.log("Finished processing resolved audits");
 	console.log(output);
-	SpreadsheetApp.getUi().alert(
-		"Resolved audits have been processed. Check the logs for details.",
+	SpreadsheetApp.getActiveSpreadsheet().toast(
+		"Resolved audits have been processed.",
+		"Process Complete",
+		5
 	);
 }
