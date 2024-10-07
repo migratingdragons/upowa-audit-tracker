@@ -275,8 +275,13 @@ function sortResolvedSheet(sheetName) {
 	const timestampIndex = headers.indexOf(CONSTANTS.COLUMN_NAMES.TIMESTAMP) + 1;
 
 	if (timestampIndex > 0) {
-		const range = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn());
-		range.sort({column: timestampIndex, ascending: false});
+		const range = sheet.getRange(
+			2,
+			1,
+			sheet.getLastRow() - 1,
+			sheet.getLastColumn(),
+		);
+		range.sort({ column: timestampIndex, ascending: false });
 	}
 }
 
