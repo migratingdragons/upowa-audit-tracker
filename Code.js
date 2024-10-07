@@ -197,37 +197,31 @@ function setupInitialColumns(sheet) {
  */
 function moveResolvedRows() {
 	const lock = LockService.getDocumentLock();
-	const output = [];
 	try {
 		lock.waitLock(30000); // wait 30 seconds for other processes to finish.
 
 		if (lock.hasLock()) {
-			output.push("Lock obtained successfully");
-			output.push("Processing Panel Sheet:");
 			moveResolvedRowsForSheet(CONSTANTS.PANEL_SHEET);
-			output.push("Processing Electrical Sheet:");
 			moveResolvedRowsForSheet(CONSTANTS.ELECTRICAL_SHEET);
 		} else {
-			output.push("Could not obtain lock after 30 seconds.");
+			console.log("Could not obtain lock after 30 seconds.");
 		}
 	} catch (e) {
-		output.push(`Error in moveResolvedRows: ${e.toString()}`);
+		console.error(`Error in moveResolvedRows: ${e.toString()}`);
 	} finally {
 		if (lock.hasLock()) {
 			lock.releaseLock();
-			output.push("Lock released");
 		}
 	}
-	return output.join("\n");
 }
 
 /**
  * Moves resolved rows from a source sheet to the corresponding resolved sheet.
  * Determines the target sheet based on the job type.
  * Appends resolved rows to the target sheet and deletes them from the source sheet.
+ * Sorts the target sheet by timestamp after moving rows.
  */
 function moveResolvedRowsForSheet(sourceSheetName) {
-	console.log(`Starting to process sheet: ${sourceSheetName}`);
 	const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
 	const sourceSheet = spreadsheet.getSheetByName(sourceSheetName);
 
@@ -235,33 +229,22 @@ function moveResolvedRowsForSheet(sourceSheetName) {
 	const headers = data.shift();
 	const resolvedIndex = headers.indexOf(CONSTANTS.COLUMN_NAMES.RESOLVED);
 	const jobTypeIndex = headers.indexOf(CONSTANTS.COLUMN_NAMES.JOB_TYPE);
+	const timestampIndex = headers.indexOf(CONSTANTS.COLUMN_NAMES.TIMESTAMP);
 
-	console.log(
-		`Resolved column index: ${resolvedIndex}, Job Type column index: ${jobTypeIndex}`,
-	);
-
-	if (resolvedIndex === -1 || jobTypeIndex === -1) {
+	if (resolvedIndex === -1 || jobTypeIndex === -1 || timestampIndex === -1) {
 		console.log("Required columns not found. Exiting function.");
 		return;
 	}
 
-	let rowsProcessed = 0;
-	let rowsMoved = 0;
-
 	// Process rows in reverse order to avoid issues with changing indices
 	for (let i = data.length - 1; i >= 0; i--) {
-		rowsProcessed++;
 		if (data[i][resolvedIndex] === true) {
-			console.log(`Found resolved row at index ${i}`);
 			const rowIndex = i + 2; // +2 because of 0-indexing and header row
 			const jobType = data[i][jobTypeIndex];
 			const targetSheetName = getResolvedSheetName(jobType);
 
-			console.log(`Moving row ${rowIndex} to ${targetSheetName}`);
-
 			let targetSheet = spreadsheet.getSheetByName(targetSheetName);
 			if (!targetSheet) {
-				console.log(`Creating new sheet: ${targetSheetName}`);
 				targetSheet = spreadsheet.insertSheet(targetSheetName);
 				setupInitialColumns(targetSheet);
 			}
@@ -272,12 +255,29 @@ function moveResolvedRowsForSheet(sourceSheetName) {
 
 			// Delete from source sheet
 			sourceSheet.deleteRow(rowIndex);
-			rowsMoved++;
 		}
 	}
 
-	console.log(`Finished processing ${sourceSheetName}`);
-	console.log(`Rows processed: ${rowsProcessed}, Rows moved: ${rowsMoved}`);
+	// Sort the target sheets
+	sortResolvedSheet(getResolvedSheetName(CONSTANTS.JOB_TYPE.INSTALLATION));
+	sortResolvedSheet(CONSTANTS.RESOLVED_ELECTRICAL_SHEET);
+}
+
+/**
+ * Sorts a resolved sheet by timestamp in descending order (most recent first).
+ */
+function sortResolvedSheet(sheetName) {
+	const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
+	const sheet = spreadsheet.getSheetByName(sheetName);
+	if (!sheet) return;
+
+	const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+	const timestampIndex = headers.indexOf(CONSTANTS.COLUMN_NAMES.TIMESTAMP) + 1;
+
+	if (timestampIndex > 0) {
+		const range = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn());
+		range.sort({column: timestampIndex, ascending: false});
+	}
 }
 
 /**
