@@ -6,6 +6,11 @@ function onOpen() {
 }
 
 function processResolvedAudits() {
-	moveResolvedRows();
-	SpreadsheetApp.getUi().alert("Resolved audits have been processed.");
+	console.log("Starting to process resolved audits");
+	const output = moveResolvedRows();
+	console.log("Finished processing resolved audits");
+	console.log(output);
+	SpreadsheetApp.getUi().alert(
+		"Resolved audits have been processed. Check the logs for details.",
+	);
 }
