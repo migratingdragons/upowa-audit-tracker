@@ -20,10 +20,24 @@ const CONSTANTS = {
 		JOB_TYPE: "answers.Job_Type.value",
 	},
 	SUMMARY_COLUMNS: [
-		"Audit_Date", "Install_date", "Auditor", "Job_Type", "Installer", "Compliant",
-		"Non_Compliance.Reason", "Non_Compliance.Severity", "Site", "Job_No", "Plot_No",
-		"Team", "Audit_Type", "Authorised_for_NC", "Remedial_Required", "Remedial_Details",
-		"Notes", "submissionid"
+		"Audit_Date",
+		"Install_date",
+		"Auditor",
+		"Job_Type",
+		"Installer",
+		"Compliant",
+		"Non_Compliance.Reason",
+		"Non_Compliance.Severity",
+		"Site",
+		"Job_No",
+		"Plot_No",
+		"Team",
+		"Audit_Type",
+		"Authorised_for_NC",
+		"Remedial_Required",
+		"Remedial_Details",
+		"Notes",
+		"submissionid",
 	],
 };
 
@@ -81,7 +95,7 @@ function appendToSummarySheet(data) {
 		summarySheet.appendRow(CONSTANTS.SUMMARY_COLUMNS);
 	}
 
-	const newRow = CONSTANTS.SUMMARY_COLUMNS.map(column => {
+	const newRow = CONSTANTS.SUMMARY_COLUMNS.map((column) => {
 		switch (column) {
 			case "Audit_Date":
 				return data.answers.Audit_Date?.value || "";
