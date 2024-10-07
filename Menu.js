@@ -13,6 +13,6 @@ function processResolvedAudits() {
 	SpreadsheetApp.getActiveSpreadsheet().toast(
 		"Resolved audits have been processed.",
 		"Process Complete",
-		5
+		5,
 	);
 }
