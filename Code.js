@@ -123,11 +123,9 @@ function appendToSummarySheet(data) {
 		const value = path.split(".").reduce((obj, key) => {
 			if (obj && key.includes("[")) {
 				const [arrayName, index] = key.split(/[\[\]]/);
-				return obj[arrayName] && obj[arrayName][Number.parseInt(index)]
-					? obj[arrayName][Number.parseInt(index)]
-					: undefined;
+				return obj[arrayName]?.[Number.parseInt(index)];
 			}
-			return obj && obj[key];
+			return obj?.[key];
 		}, data);
 
 		if (column === "Compliant" || column === "Remedial_Required") {
