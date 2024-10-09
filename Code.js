@@ -47,8 +47,7 @@ const CONSTANTS = {
 		Installer: "answers.Installer.value",
 		Compliant: "answers.Compliant.value",
 		"Non_Compliance.Reason": "answers.Non_Compliance.values[0].Reason.value",
-		"Non_Compliance.Severity":
-			"answers.Non_Compliance.values[0].Severity.value",
+		"Non_Compliance.Severity": "answers.Non_Compliance.values[0].Severity.value",
 		Site: "answers.Site.value",
 		Job_No: "answers.Job_No.value",
 		Plot_No: "answers.Plot_No.value",
