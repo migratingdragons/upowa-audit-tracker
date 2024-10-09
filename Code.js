@@ -20,31 +20,46 @@ const CONSTANTS = {
 		JOB_TYPE: "answers.Job_Type.value",
 	},
 	SUMMARY_COLUMNS: [
-		"Audit_Date", "Install_date", "Auditor", "Job_Type", "Installer", "Compliant",
-		"Non_Compliance.Reason", "Non_Compliance.Severity", "Site", "Job_No", "Plot_No",
-		"Team", "Audit_Type", "Authorised_for_NC", "Remedial_Required", "Remedial_Details",
-		"Notes", "submissionid"
+		"Audit_Date",
+		"Install_date",
+		"Auditor",
+		"Job_Type",
+		"Installer",
+		"Compliant",
+		"Non_Compliance.Reason",
+		"Non_Compliance.Severity",
+		"Site",
+		"Job_No",
+		"Plot_No",
+		"Team",
+		"Audit_Type",
+		"Authorised_for_NC",
+		"Remedial_Required",
+		"Remedial_Details",
+		"Notes",
+		"submissionid",
 	],
 	DATA_MAP: {
-		"Audit_Date": "answers.Audit_Date.value",
-		"Install_date": "answers.Install_date.value",
-		"Auditor": "answers.Auditor.value",
-		"Job_Type": "answers.Job_Type.value",
-		"Installer": "answers.Installer.value",
-		"Compliant": "answers.Compliant.value",
+		Audit_Date: "answers.Audit_Date.value",
+		Install_date: "answers.Install_date.value",
+		Auditor: "answers.Auditor.value",
+		Job_Type: "answers.Job_Type.value",
+		Installer: "answers.Installer.value",
+		Compliant: "answers.Compliant.value",
 		"Non_Compliance.Reason": "answers.Non_Compliance.values[0].Reason.value",
-		"Non_Compliance.Severity": "answers.Non_Compliance.values[0].Severity.value",
-		"Site": "answers.Site.value",
-		"Job_No": "answers.Job_No.value",
-		"Plot_No": "answers.Plot_No.value",
-		"Team": null,
-		"Audit_Type": "answers.Audit_Type.value",
-		"Authorised_for_NC": "answers.Authorised_for_NC.value",
-		"Remedial_Required": "answers.Remedial_Required.value",
-		"Remedial_Details": "answers.Remedial_Details.value",
-		"Notes": "answers.Notes.value",
-		"submissionid": "metadata.submission_id"
-	}
+		"Non_Compliance.Severity":
+			"answers.Non_Compliance.values[0].Severity.value",
+		Site: "answers.Site.value",
+		Job_No: "answers.Job_No.value",
+		Plot_No: "answers.Plot_No.value",
+		Team: null,
+		Audit_Type: "answers.Audit_Type.value",
+		Authorised_for_NC: "answers.Authorised_for_NC.value",
+		Remedial_Required: "answers.Remedial_Required.value",
+		Remedial_Details: "answers.Remedial_Details.value",
+		Notes: "answers.Notes.value",
+		submissionid: "metadata.submission_id",
+	},
 };
 
 /**
@@ -93,28 +108,28 @@ function doPost(e) {
 }
 
 function appendToSummarySheet(data) {
-    const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
-    let summarySheet = spreadsheet.getSheetByName(CONSTANTS.SUMMARY_SHEET);
+	const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
+	let summarySheet = spreadsheet.getSheetByName(CONSTANTS.SUMMARY_SHEET);
 
-    if (!summarySheet) {
-        summarySheet = spreadsheet.insertSheet(CONSTANTS.SUMMARY_SHEET);
-        summarySheet.appendRow(CONSTANTS.SUMMARY_COLUMNS);
-    }
+	if (!summarySheet) {
+		summarySheet = spreadsheet.insertSheet(CONSTANTS.SUMMARY_SHEET);
+		summarySheet.appendRow(CONSTANTS.SUMMARY_COLUMNS);
+	}
 
-    const newRow = CONSTANTS.SUMMARY_COLUMNS.map(column => {
-        const path = CONSTANTS.DATA_MAP[column];
-        if (!path) return "";
+	const newRow = CONSTANTS.SUMMARY_COLUMNS.map((column) => {
+		const path = CONSTANTS.DATA_MAP[column];
+		if (!path) return "";
 
-        let value = path.split('.').reduce((obj, key) => obj && obj[key], data);
+		const value = path.split(".").reduce((obj, key) => obj && obj[key], data);
 
-        if (column === "Compliant" || column === "Remedial_Required") {
-            return value ? "yes" : "no";
-        }
+		if (column === "Compliant" || column === "Remedial_Required") {
+			return value ? "yes" : "no";
+		}
 
-        return value || "";
-    });
+		return value || "";
+	});
 
-    summarySheet.appendRow(newRow);
+	summarySheet.appendRow(newRow);
 }
 
 /**
