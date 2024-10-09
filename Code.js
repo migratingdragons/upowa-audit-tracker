@@ -47,7 +47,8 @@ const CONSTANTS = {
 		Installer: "answers.Installer.value",
 		Compliant: "answers.Compliant.value",
 		"Non_Compliance.Reason": "answers.Non_Compliance.values[0].Reason.value",
-		"Non_Compliance.Severity": "answers.Non_Compliance.values[0].Severity.value",
+		"Non_Compliance.Severity":
+			"answers.Non_Compliance.values[0].Severity.value",
 		Site: "answers.Site.value",
 		Job_No: "answers.Job_No.value",
 		Plot_No: "answers.Plot_No.value",
@@ -107,34 +108,36 @@ function doPost(e) {
 }
 
 function appendToSummarySheet(data) {
-    const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
-    let summarySheet = spreadsheet.getSheetByName(CONSTANTS.SUMMARY_SHEET);
+	const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
+	let summarySheet = spreadsheet.getSheetByName(CONSTANTS.SUMMARY_SHEET);
 
-    if (!summarySheet) {
-        summarySheet = spreadsheet.insertSheet(CONSTANTS.SUMMARY_SHEET);
-        summarySheet.appendRow(CONSTANTS.SUMMARY_COLUMNS);
-    }
+	if (!summarySheet) {
+		summarySheet = spreadsheet.insertSheet(CONSTANTS.SUMMARY_SHEET);
+		summarySheet.appendRow(CONSTANTS.SUMMARY_COLUMNS);
+	}
 
-    const newRow = CONSTANTS.SUMMARY_COLUMNS.map(column => {
-        const path = CONSTANTS.DATA_MAP[column];
-        if (!path) return "";
+	const newRow = CONSTANTS.SUMMARY_COLUMNS.map((column) => {
+		const path = CONSTANTS.DATA_MAP[column];
+		if (!path) return "";
 
-        let value = path.split('.').reduce((obj, key) => {
-            if (obj && key.includes('[')) {
-                const [arrayName, index] = key.split(/[\[\]]/);
-                return obj[arrayName] && obj[arrayName][parseInt(index)] ? obj[arrayName][parseInt(index)] : undefined;
-            }
-            return obj && obj[key];
-        }, data);
+		const value = path.split(".").reduce((obj, key) => {
+			if (obj && key.includes("[")) {
+				const [arrayName, index] = key.split(/[\[\]]/);
+				return obj[arrayName] && obj[arrayName][Number.parseInt(index)]
+					? obj[arrayName][Number.parseInt(index)]
+					: undefined;
+			}
+			return obj && obj[key];
+		}, data);
 
-        if (column === "Compliant" || column === "Remedial_Required") {
-            return value ? "yes" : "no";
-        }
+		if (column === "Compliant" || column === "Remedial_Required") {
+			return value ? "yes" : "no";
+		}
 
-        return value || "";
-    });
+		return value || "";
+	});
 
-    summarySheet.appendRow(newRow);
+	summarySheet.appendRow(newRow);
 }
 
 /**
