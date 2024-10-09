@@ -107,28 +107,34 @@ function doPost(e) {
 }
 
 function appendToSummarySheet(data) {
-	const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
-	let summarySheet = spreadsheet.getSheetByName(CONSTANTS.SUMMARY_SHEET);
+    const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
+    let summarySheet = spreadsheet.getSheetByName(CONSTANTS.SUMMARY_SHEET);
 
-	if (!summarySheet) {
-		summarySheet = spreadsheet.insertSheet(CONSTANTS.SUMMARY_SHEET);
-		summarySheet.appendRow(CONSTANTS.SUMMARY_COLUMNS);
-	}
+    if (!summarySheet) {
+        summarySheet = spreadsheet.insertSheet(CONSTANTS.SUMMARY_SHEET);
+        summarySheet.appendRow(CONSTANTS.SUMMARY_COLUMNS);
+    }
 
-	const newRow = CONSTANTS.SUMMARY_COLUMNS.map((column) => {
-		const path = CONSTANTS.DATA_MAP[column];
-		if (!path) return "";
+    const newRow = CONSTANTS.SUMMARY_COLUMNS.map(column => {
+        const path = CONSTANTS.DATA_MAP[column];
+        if (!path) return "";
 
-		const value = path.split(".").reduce((obj, key) => obj?.[key], data);
+        let value = path.split('.').reduce((obj, key) => {
+            if (obj && key.includes('[')) {
+                const [arrayName, index] = key.split(/[\[\]]/);
+                return obj[arrayName] && obj[arrayName][parseInt(index)] ? obj[arrayName][parseInt(index)] : undefined;
+            }
+            return obj && obj[key];
+        }, data);
 
-		if (column === "Compliant" || column === "Remedial_Required") {
-			return value ? "yes" : "no";
-		}
+        if (column === "Compliant" || column === "Remedial_Required") {
+            return value ? "yes" : "no";
+        }
 
-		return value || "";
-	});
+        return value || "";
+    });
 
-	summarySheet.appendRow(newRow);
+    summarySheet.appendRow(newRow);
 }
 
 /**
