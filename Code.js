@@ -120,7 +120,7 @@ function appendToSummarySheet(data) {
 		const path = CONSTANTS.DATA_MAP[column];
 		if (!path) return "";
 
-		const value = path.split(".").reduce((obj, key) => obj && obj[key], data);
+		const value = path.split(".").reduce((obj, key) => obj?.[key], data);
 
 		if (column === "Compliant" || column === "Remedial_Required") {
 			return value ? "yes" : "no";
