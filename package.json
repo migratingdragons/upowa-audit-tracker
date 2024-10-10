@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A Google Apps Script to document qms layout and functionality.",
   "scripts": {
-    "push": "clasp push --auth ~/.clasprc.upowa.json",
+    "push": "clasp push --auth ~/.clasprc.upowa.json --force",
     "pull": "clasp pull --auth ~/.clasprc.upowa.json",
     "watch": "clasp push --watch --auth ~/.clasprc.upowa.json",
     "open": "clasp open --auth ~/.clasprc.upowa.json",
