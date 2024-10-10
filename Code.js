@@ -103,7 +103,6 @@ function doPost(e) {
 				message: "Data processed successfully",
 			}),
 		)
-			.setStatusCode(200);
 	} catch (error) {
 		console.error(`Error in doPost: ${error.message}`);
 
@@ -114,7 +113,6 @@ function doPost(e) {
 				message: `Error: ${error.message}`,
 			}),
 		)
-			.setStatusCode(400);
 	}
 }
 
