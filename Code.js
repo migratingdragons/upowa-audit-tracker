@@ -78,56 +78,60 @@ const TESTING_DATA = testDataForDoPost;
  * Returns a success message or an error message.
  */
 function doPost(e) {
-  if (acquireLock()) {
-    try {
-      let jsonData;
+	if (acquireLock()) {
+		try {
+			let jsonData;
 
-      if (TESTING_MODE && !e) {
-        jsonData = TESTING_DATA;
-        console.log("Using testing data");
-      } else {
-        jsonData = JSON.parse(e.postData.contents);
-      }
+			if (TESTING_MODE && !e) {
+				jsonData = TESTING_DATA;
+				console.log("Using testing data");
+			} else {
+				jsonData = JSON.parse(e.postData.contents);
+			}
 
-      // Debug mode: send email with jsonData
-      if (DEBUG_MODE) {
-        sendDebugEmail(jsonData);
-      }
+			// Debug mode: send email with jsonData
+			if (DEBUG_MODE) {
+				sendDebugEmail(jsonData);
+			}
 
-      processAndAppendData(jsonData);
-      appendToSummarySheet(jsonData);
+			processAndAppendData(jsonData);
+			appendToSummarySheet(jsonData);
 
-      // Return a proper HTTP response with 200 status code
-      return ContentService.createTextOutput(JSON.stringify({
-        status: 'success',
-        message: 'Data processed successfully'
-      }))
-      .setMimeType(ContentService.MimeType.JSON)
-      .setStatusCode(200);
+			// Return a proper HTTP response with 200 status code
+			return ContentService.createTextOutput(
+				JSON.stringify({
+					status: "success",
+					message: "Data processed successfully",
+				}),
+			)
+				.setMimeType(ContentService.MimeType.JSON)
+				.setStatusCode(200);
+		} catch (error) {
+			console.error(`Error in doPost: ${error.message}`);
 
-    } catch (error) {
-      console.error(`Error in doPost: ${error.message}`);
-      
-      // Return a proper HTTP response with 400 status code for errors
-      return ContentService.createTextOutput(JSON.stringify({
-        status: 'error',
-        message: `Error: ${error.message}`
-      }))
-      .setMimeType(ContentService.MimeType.JSON)
-      .setStatusCode(400);
-
-    } finally {
-      releaseLock(); // Ensure the lock is released even if an error occurs
-    }
-  } else {
-    console.log("Could not acquire lock. Another process may be running.");
-    return ContentService.createTextOutput(JSON.stringify({
-      status: 'error',
-      message: 'Could not acquire lock. Please try again later.'
-    }))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setStatusCode(503); // 503 Service Unavailable
-  }
+			// Return a proper HTTP response with 400 status code for errors
+			return ContentService.createTextOutput(
+				JSON.stringify({
+					status: "error",
+					message: `Error: ${error.message}`,
+				}),
+			)
+				.setMimeType(ContentService.MimeType.JSON)
+				.setStatusCode(400);
+		} finally {
+			releaseLock(); // Ensure the lock is released even if an error occurs
+		}
+	} else {
+		console.log("Could not acquire lock. Another process may be running.");
+		return ContentService.createTextOutput(
+			JSON.stringify({
+				status: "error",
+				message: "Could not acquire lock. Please try again later.",
+			}),
+		)
+			.setMimeType(ContentService.MimeType.JSON)
+			.setStatusCode(503); // 503 Service Unavailable
+	}
 }
 
 function appendToSummarySheet(data) {
@@ -413,17 +417,17 @@ function testDoPost() {
  * @returns {boolean} True if the lock was successfully acquired, false otherwise.
  */
 function acquireLock() {
-  var lock = LockService.getScriptLock();
-  try {
-    console.log("Getting lock");
-    // Wait up to 30 seconds to acquire the lock
-    lock.waitLock(30000);
-    console.log("Successfully got lock");
-    return true;
-  } catch (e) {
-    console.log("Could not acquire lock");
-    return false;
-  }
+	var lock = LockService.getScriptLock();
+	try {
+		console.log("Getting lock");
+		// Wait up to 30 seconds to acquire the lock
+		lock.waitLock(30000);
+		console.log("Successfully got lock");
+		return true;
+	} catch (e) {
+		console.log("Could not acquire lock");
+		return false;
+	}
 }
 
 /**
@@ -431,7 +435,7 @@ function acquireLock() {
  * This should be called after the completion of the task that required the lock.
  */
 function releaseLock() {
-  var lock = LockService.getScriptLock();
-  console.log("Releasing lock");
-  lock.releaseLock();
+	var lock = LockService.getScriptLock();
+	console.log("Releasing lock");
+	lock.releaseLock();
 }
