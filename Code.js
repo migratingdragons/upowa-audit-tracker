@@ -417,7 +417,7 @@ function testDoPost() {
  * @returns {boolean} True if the lock was successfully acquired, false otherwise.
  */
 function acquireLock() {
-	var lock = LockService.getScriptLock();
+	const lock = LockService.getScriptLock();
 	try {
 		console.log("Getting lock");
 		// Wait up to 30 seconds to acquire the lock
@@ -435,7 +435,7 @@ function acquireLock() {
  * This should be called after the completion of the task that required the lock.
  */
 function releaseLock() {
-	var lock = LockService.getScriptLock();
+	const lock = LockService.getScriptLock();
 	console.log("Releasing lock");
 	lock.releaseLock();
 }
