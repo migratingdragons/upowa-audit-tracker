@@ -1,36 +1,36 @@
 {
-  "name": "upowa-audit-tracker",
-  "version": "1.0.0",
-  "description": "A Google Apps Script to document qms layout and functionality.",
-  "scripts": {
-    "push": "clasp push --auth ~/.clasprc.upowa.json --force",
-    "pull": "clasp pull --auth ~/.clasprc.upowa.json",
-    "watch": "clasp push --watch --auth ~/.clasprc.upowa.json",
-    "open": "clasp open --auth ~/.clasprc.upowa.json",
-    "deploy": "clasp deploy --auth ~/.clasprc.upowa.json",
-    "undeploy": "clasp undeploy --auth ~/.clasprc.upowa.json",
-    "version": "clasp version --auth ~/.clasprc.upowa.json",
-    "logs": "clasp logs --auth ~/.clasprc.upowa.json",
-    "redeploy": "clasp deployments --auth ~/.clasprc.upowa.json | grep -v '@HEAD' | awk '{print $2}' | xargs -I {} clasp deploy --deploymentId {} --auth ~/.clasprc.upowa.json"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/migratingdragons/upowa-audit-tracker.git"
-  },
-  "author": "Tim Dobson",
-  "license": "All Rights Reserved",
-  "bugs": {
-    "url": "https://github.com/migratingdragons/upowa-audit-tracker/issues"
-  },
-  "homepage": "https://github.com/migratingdragons/upowa-audit-tracker#readme",
-  "dependencies": {
-    "@types/google-apps-script": "^1.0.56",
-    "clasp": "^1.0.0",
-    "eslint": "^9.11.1"
-  },
-  "devDependencies": {
-    "@google/clasp": "^2.4.2"
-  },
-  "main": "index.js",
-  "keywords": []
+	"name": "upowa-audit-tracker",
+	"version": "1.0.0",
+	"description": "A Google Apps Script to document qms layout and functionality.",
+	"scripts": {
+		"push": "clasp push --auth ~/.clasprc.upowa.json --force",
+		"pull": "clasp pull --auth ~/.clasprc.upowa.json",
+		"watch": "clasp push --watch --auth ~/.clasprc.upowa.json",
+		"open": "clasp open --auth ~/.clasprc.upowa.json",
+		"deploy": "clasp deploy --auth ~/.clasprc.upowa.json",
+		"undeploy": "clasp undeploy --auth ~/.clasprc.upowa.json",
+		"version": "clasp version --auth ~/.clasprc.upowa.json",
+		"logs": "clasp logs --auth ~/.clasprc.upowa.json",
+		"redeploy": "clasp deployments --auth ~/.clasprc.upowa.json | grep -v '@HEAD' | awk '{print $2}' | xargs -I {} clasp deploy --deploymentId {} --auth ~/.clasprc.upowa.json"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/migratingdragons/upowa-audit-tracker.git"
+	},
+	"author": "Tim Dobson",
+	"license": "All Rights Reserved",
+	"bugs": {
+		"url": "https://github.com/migratingdragons/upowa-audit-tracker/issues"
+	},
+	"homepage": "https://github.com/migratingdragons/upowa-audit-tracker#readme",
+	"dependencies": {
+		"@types/google-apps-script": "^1.0.56",
+		"clasp": "^1.0.0",
+		"eslint": "^9.11.1"
+	},
+	"devDependencies": {
+		"@google/clasp": "^2.4.2"
+	},
+	"main": "index.js",
+	"keywords": []
 }
