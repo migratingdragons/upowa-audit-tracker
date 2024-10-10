@@ -103,7 +103,6 @@ function doPost(e) {
 				message: "Data processed successfully",
 			}),
 		)
-			.setMimeType(ContentService.MimeType.JSON)
 			.setStatusCode(200);
 	} catch (error) {
 		console.error(`Error in doPost: ${error.message}`);
@@ -115,7 +114,6 @@ function doPost(e) {
 				message: `Error: ${error.message}`,
 			}),
 		)
-			.setMimeType(ContentService.MimeType.JSON)
 			.setStatusCode(400);
 	}
 }
