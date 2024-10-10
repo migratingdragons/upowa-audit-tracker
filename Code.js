@@ -78,33 +78,43 @@ const TESTING_DATA = testDataForDoPost;
  * Returns a success message or an error message.
  */
 function doPost(e) {
-	try {
-		let jsonData;
+  try {
+    let jsonData;
 
-		if (TESTING_MODE && !e) {
-			jsonData = TESTING_DATA;
-			console.log("Using testing data");
-		} else {
-			jsonData = JSON.parse(e.postData.contents);
-		}
+    if (TESTING_MODE && !e) {
+      jsonData = TESTING_DATA;
+      console.log("Using testing data");
+    } else {
+      jsonData = JSON.parse(e.postData.contents);
+    }
 
-		// Debug mode: send email with jsonData
-		if (DEBUG_MODE) {
-			sendDebugEmail(jsonData);
-		}
+    // Debug mode: send email with jsonData
+    if (DEBUG_MODE) {
+      sendDebugEmail(jsonData);
+    }
 
-		processAndAppendData(jsonData);
-		appendToSummarySheet(jsonData);
+    processAndAppendData(jsonData);
+    appendToSummarySheet(jsonData);
 
-		return ContentService.createTextOutput(
-			"Data processed successfully",
-		).setMimeType(ContentService.MimeType.TEXT);
-	} catch (error) {
-		console.error(`Error in doPost: ${error.message}`);
-		return ContentService.createTextOutput(
-			`Error: ${error.message}`,
-		).setMimeType(ContentService.MimeType.TEXT);
-	}
+    // Return a proper HTTP response with 200 status code
+    return ContentService.createTextOutput(JSON.stringify({
+      status: 'success',
+      message: 'Data processed successfully'
+    }))
+    .setMimeType(ContentService.MimeType.JSON)
+    .setStatusCode(200);
+
+  } catch (error) {
+    console.error(`Error in doPost: ${error.message}`);
+    
+    // Return a proper HTTP response with 400 status code for errors
+    return ContentService.createTextOutput(JSON.stringify({
+      status: 'error',
+      message: `Error: ${error.message}`
+    }))
+    .setMimeType(ContentService.MimeType.JSON)
+    .setStatusCode(400);
+  }
 }
 
 function appendToSummarySheet(data) {
