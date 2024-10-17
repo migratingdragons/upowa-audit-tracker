@@ -66,8 +66,8 @@ const CONSTANTS = {
  * Debug and testing constants.
  */
 const DEBUG_MODE = true;
-const TESTING_MODE = false;
-const TESTING_DATA = testDataForDoPost;
+const TESTING_MODE = true;
+const TESTING_DATA = newTestData;
 
 /**
  * Handles POST requests to process incoming data.
