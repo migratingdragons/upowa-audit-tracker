@@ -86,21 +86,22 @@ const testDataForDoPost = {
 };
 
 const newTestData = {
-   "metadata": {
-     "form_namespace": "http://www.devicemagic.com/xforms/752ba230-5cae-013d-8a0b-620dcf7168bf",
-     "submission_id": "test-1729209009"
-   },
-   "device": {
-     "identifier": "test-device"
-   },
-   "form": {
-     "id": 12345,
-     "name": "Test Form"
-   },
-   "answers": [
-     {
-       "question_id": 1,
-       "value": "Sample Answer"
-     }
-   ]
+	metadata: {
+		form_namespace:
+			"http://www.devicemagic.com/xforms/752ba230-5cae-013d-8a0b-620dcf7168bf",
+		submission_id: "test-1729209009",
+	},
+	device: {
+		identifier: "test-device",
+	},
+	form: {
+		id: 12345,
+		name: "Test Form",
+	},
+	answers: [
+		{
+			question_id: 1,
+			value: "Sample Answer",
+		},
+	],
 };
