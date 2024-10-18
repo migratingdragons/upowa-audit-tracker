@@ -65,8 +65,8 @@ const CONSTANTS = {
 /**
  * Debug and testing constants.
  */
-const DEBUG_MODE = true;
-const TESTING_MODE = true;
+const DEBUG_MODE = false;
+const TESTING_MODE = false;
 const TESTING_DATA = testData18Oct;
 
 /**
