@@ -97,27 +97,23 @@ function doPost(e) {
 			processAndAppendData(jsonData);
 			appendToSummarySheet(jsonData);
 
-			// Return a proper HTTP response with 200 status code
+			// Return a success response
 			return ContentService.createTextOutput(
 				JSON.stringify({
 					status: "success",
 					message: "Data processed successfully",
-				}),
-			)
-				.setMimeType(ContentService.MimeType.JSON)
-				.setStatusCode(200);
+				})
+			).setMimeType(ContentService.MimeType.JSON);
 		} catch (error) {
 			console.error(`Error in doPost: ${error.message}`);
 
-			// Return a proper HTTP response with 400 status code for errors
+			// Return an error response
 			return ContentService.createTextOutput(
 				JSON.stringify({
 					status: "error",
 					message: `Error: ${error.message}`,
-				}),
-			)
-				.setMimeType(ContentService.MimeType.JSON)
-				.setStatusCode(400);
+				})
+			).setMimeType(ContentService.MimeType.JSON);
 		} finally {
 			releaseLock(); // Ensure the lock is released even if an error occurs
 		}
@@ -127,10 +123,8 @@ function doPost(e) {
 			JSON.stringify({
 				status: "error",
 				message: "Could not acquire lock. Please try again later.",
-			}),
-		)
-			.setMimeType(ContentService.MimeType.JSON)
-			.setStatusCode(503); // 503 Service Unavailable
+			})
+		).setMimeType(ContentService.MimeType.JSON);
 	}
 }
 
