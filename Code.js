@@ -102,7 +102,7 @@ function doPost(e) {
 				JSON.stringify({
 					status: "success",
 					message: "Data processed successfully",
-				})
+				}),
 			).setMimeType(ContentService.MimeType.JSON);
 		} catch (error) {
 			console.error(`Error in doPost: ${error.message}`);
@@ -112,7 +112,7 @@ function doPost(e) {
 				JSON.stringify({
 					status: "error",
 					message: `Error: ${error.message}`,
-				})
+				}),
 			).setMimeType(ContentService.MimeType.JSON);
 		} finally {
 			releaseLock(); // Ensure the lock is released even if an error occurs
@@ -123,7 +123,7 @@ function doPost(e) {
 			JSON.stringify({
 				status: "error",
 				message: "Could not acquire lock. Please try again later.",
-			})
+			}),
 		).setMimeType(ContentService.MimeType.JSON);
 	}
 }
