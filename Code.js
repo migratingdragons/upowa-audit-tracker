@@ -67,7 +67,7 @@ const CONSTANTS = {
  */
 const DEBUG_MODE = true;
 const TESTING_MODE = true;
-const TESTING_DATA = newTestData;
+const TESTING_DATA = testData18Oct;
 
 /**
  * Handles POST requests to process incoming data.
