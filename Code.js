@@ -189,12 +189,16 @@ function processAndAppendData(data) {
 
 	// Determine the correct sheet based on Job_Type and authorization
 	const jobType = data.answers.Job_Type.value;
-	const authValue = data.answers.Authorised_for_NC.value.toString().toLowerCase();
-	const isAuthorized = authValue === 'yes' || authValue === 'true';
+	const authValue = data.answers.Authorised_for_NC.value
+		.toString()
+		.toLowerCase();
+	const isAuthorized = authValue === "yes" || authValue === "true";
 
 	let sheetName;
 	if (jobType === CONSTANTS.JOB_TYPE.INSTALLATION) {
-		sheetName = isAuthorized ? CONSTANTS.PANEL_SHEET : CONSTANTS.ELECTRICAL_SHEET;
+		sheetName = isAuthorized
+			? CONSTANTS.PANEL_SHEET
+			: CONSTANTS.ELECTRICAL_SHEET;
 	} else {
 		sheetName = CONSTANTS.ELECTRICAL_SHEET;
 	}
