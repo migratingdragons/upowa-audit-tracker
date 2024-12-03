@@ -185,6 +185,24 @@ function doPost(e) {
 	}
 }
 
+/**
+ * Appends a new row to the Summary sheet with standardized columns
+ * 
+ * Summary Sheet Structure:
+ * - Contains predefined columns (SUMMARY_COLUMNS)
+ * - Maps data using DATA_MAP configuration
+ * - Converts boolean values to "yes"/"no"
+ * - Handles nested data structures
+ * - Creates sheet if it doesn't exist
+ * 
+ * Data Transformation:
+ * - Flattens nested JSON structure
+ * - Extracts specific fields defined in SUMMARY_COLUMNS
+ * - Maintains consistent column order
+ * - Handles missing data gracefully
+ * 
+ * @param {Object} data - The audit submission data to summarize
+ */
 function appendToSummarySheet(data) {
 	const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
 	let summarySheet = spreadsheet.getSheetByName(CONSTANTS.SUMMARY_SHEET);
@@ -235,11 +253,29 @@ function sendDebugEmail(jsonData) {
 }
 
 /**
- * Processes and appends incoming data to the appropriate sheet.
- * Determines the correct sheet based on the job type.
- * Sets up initial columns if the sheet does not exist.
- * Processes metadata and answers, ensuring necessary columns exist.
- * Appends the new row with the processed data and adds a checkbox to the "Resolved" column.
+ * Processes and appends incoming data to both Summary and Non-compliant sheets
+ * 
+ * Data Flow:
+ * 1. Summary Sheet:
+ *    - Always receives a new row for every audit
+ *    - Contains predefined columns (SUMMARY_COLUMNS)
+ *    - Data is mapped using DATA_MAP configuration
+ *    - Provides overview of all audits (compliant and non-compliant)
+ * 
+ * 2. Non-compliant Sheets:
+ *    - Only receives data for non-compliant audits
+ *    - Dynamic columns based on incoming data
+ *    - Includes all metadata and answers with original structure
+ *    - Has management columns:
+ *      * Resolved (checkbox)
+ *      * Comment (for resolution notes)
+ *      * Timestamp (when added)
+ * 
+ * Sheet Selection:
+ * - Panel Sheet: For non-compliant Installation jobs with authorization
+ * - Electrical Sheet: For non-compliant Electrical jobs or unauthorized Installation jobs
+ * 
+ * @param {Object} data - The audit submission data
  */
 function processAndAppendData(data) {
 	const spreadsheet = SpreadsheetApp.openById(CONSTANTS.TRACKER_SPREADSHEET_ID);
