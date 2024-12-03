@@ -1,37 +1,37 @@
 /**
  * Global Constants and Configuration
- * 
+ *
  * The system uses several global constants to manage sheet names, data mappings, and configuration:
- * 
+ *
  * Sheet Names:
  * - PANEL_SHEET: Tracks active non-compliant panel installations
  * - ELECTRICAL_SHEET: Tracks active non-compliant electrical installations
  * - RESOLVED_PANEL_SHEET: Archives resolved panel issues
  * - RESOLVED_ELECTRICAL_SHEET: Archives resolved electrical issues
  * - SUMMARY_SHEET: Aggregates all audit data for reporting
- * 
+ *
  * Configuration:
  * - TRACKER_SPREADSHEET_ID: The Google Sheet ID where all data is stored
  * - DEBUG_EMAIL: Email address for debug notifications
- * 
+ *
  * Data Structure:
  * - JOB_TYPE: Defines valid installation types (Installation/Electrical)
  * - COLUMN_NAMES: Key column identifiers used across sheets
  * - SUMMARY_COLUMNS: Defines the structure of the summary sheet
  * - DATA_MAP: Maps incoming JSON fields to spreadsheet columns
- * 
+ *
  * System State:
  * - DEBUG_MODE: When true, sends detailed emails about processing
  * - TESTING_MODE: When true, uses TESTING_DATA instead of POST data
  * - TESTING_DATA: Sample data structure for development
- * 
+ *
  * Data Flow:
  * 1. Data arrives via doPost() or test function
  * 2. System acquires a document lock (acquireLock())
  * 3. Data is validated and processed (processAndAppendData())
  * 4. Summary data is extracted (appendToSummarySheet())
  * 5. Resolved items are moved to archive sheets (moveResolvedRows())
- * 
+ *
  * The Menu.js file adds UI controls that trigger these functions.
  */
 const CONSTANTS = {
@@ -104,7 +104,7 @@ const TESTING_DATA = testData18Oct;
 
 /**
  * Main Entry Point: Handles POST requests to process incoming audit data
- * 
+ *
  * Flow:
  * 1. Acquires system lock to prevent concurrent modifications
  * 2. Processes either:
@@ -114,23 +114,23 @@ const TESTING_DATA = testData18Oct;
  * 4. Calls processAndAppendData() to store in appropriate sheet
  * 5. Calls appendToSummarySheet() to update reporting data
  * 6. Returns JSON response indicating success/failure
- * 
+ *
  * Error Handling:
  * - Catches and logs all errors
  * - Always releases system lock, even on failure
  * - Returns appropriate HTTP response with error details
- * 
+ *
  * Concurrent Access:
  * - Uses LockService to prevent data corruption
  * - Waits up to 30 seconds for lock acquisition
  * - Releases lock in finally block
- * 
+ *
  * Integration Points:
  * - Called by Google Apps Script when POST requests arrive
  * - Can be triggered manually via testDoPost() during development
  * - Interfaces with processAndAppendData() for storage
  * - Interfaces with appendToSummarySheet() for reporting
- * 
+ *
  * @param {Object} e - The POST event object from Google Apps Script
  * @returns {TextOutput} JSON response indicating success/failure
  */
