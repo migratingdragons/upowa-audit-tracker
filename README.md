@@ -2,88 +2,208 @@
 
 ## Overview
 
-The Upowa Audit Tracker is a Google Apps Script project designed to document and manage non-compliant installations in a Quality Management System (QMS). This script processes incoming data, moves resolved audits, and sends debug emails if needed. It is particularly useful for tracking and managing non-compliant panel and electrical installations.
+The Upowa Audit Tracker is a Google Apps Script project designed to document and manage non-compliant installations in a Quality Management System (QMS). This system processes incoming audit data from field inspections, tracks non-compliant installations, and manages their resolution workflow.
 
-## Table of Contents
+## Detailed Documentation
 
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Usage](#usage)
-  - [Scripts](#scripts)
-  - [Testing](#testing)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [License](#license)
+### System Architecture
 
-## Getting Started
+The system consists of several key components:
 
-### Prerequisites
+1. **Data Processing Pipeline**
+   - Receives POST requests with audit data
+   - Validates and processes incoming JSON data
+   - Distributes data to appropriate sheets based on installation type
+   - Handles concurrent access using document locks
 
-Before you begin, ensure you have the following installed:
+2. **Sheet Management**
+   - Maintains separate sheets for:
+     - Non-compliant Panel Installations
+     - Non-compliant Electrical Installations
+     - Resolved Panel Installations
+     - Resolved Electrical Installations
+     - Summary data
+   - Automatically creates missing sheets when needed
 
-- [Node.js](https://nodejs.org/) (v14.x or later)
-- [Google Clasp](https://github.com/google/clasp) (v2.4.2 or later)
-- A Google account with access to Google Apps Script
+3. **Data Flow**
+   ```
+   Field Audit → POST Request → doPost() → Process Data → Appropriate Sheet
+                                      ↓
+                              Debug Email (if enabled)
+   ```
 
-### Installation
+### Getting Started
 
-1. Clone the repository:
+#### Prerequisites
+
+1. **Development Environment Setup**
+   - Install Node.js (v14.x or later)
+   - Install npm (comes with Node.js)
+   - Install Google Clasp globally:
+     ```bash
+     npm install -g @google/clasp
+     ```
+
+2. **Google Account Setup**
+   - Enable Google Apps Script API in your Google Account
+   - Create a Google Cloud Project
+   - Set up OAuth 2.0 credentials
+
+#### Installation Steps
+
+1. **Clone and Configure**
    ```bash
    git clone https://github.com/migratingdragons/upowa-audit-tracker.git
    cd upowa-audit-tracker
-   ```
-
-2. Install the dependencies:
-   ```bash
    npm install
    ```
 
-3. Authenticate with Google Clasp:
+2. **Authentication**
    ```bash
    clasp login
+   # Follow the browser prompts to authenticate
    ```
 
-4. Push the script to Google Apps Script:
+3. **Project Setup**
+   - Copy `.clasp.json.example` to `.clasp.json`
+   - Update the scriptId in `.clasp.json`
+   - Push the code:
+     ```bash
+     npm run push
+     ```
+
+### Development Guide
+
+#### Code Structure
+
+1. **Code.js**
+   - Main entry point
+   - Contains core functionality:
+     - `doPost()`: Handles incoming data
+     - `processAndAppendData()`: Processes and stores data
+     - `moveResolvedRows()`: Manages resolved audits
+     - Various utility functions
+
+2. **Menu.js**
+   - Defines Google Sheets UI customizations
+   - Adds custom menu items
+   - Handles menu actions
+
+3. **aa-testData.js**
+   - Contains test data structures
+   - Used for development and testing
+
+#### Testing
+
+1. **Enable Test Mode**
+   - Open `Code.js`
+   - Set `TESTING_MODE = true`
+   - Set `DEBUG_MODE = true` for additional logging
+
+2. **Run Tests**
+   ```bash
+   # Push changes first
+   npm run push
+   
+   # Run the test function
+   clasp run testDoPost
+   ```
+
+3. **Debug Mode**
+   - When enabled, sends debug emails with JSON data
+   - Configure `DEBUG_EMAIL` in `CONSTANTS`
+
+#### Making Changes
+
+1. **Development Workflow**
+   ```bash
+   # Start watch mode
+   npm run watch
+   
+   # Make your changes
+   # Changes auto-push to Apps Script
+   
+   # View logs
+   npm run logs
+   ```
+
+2. **Adding New Features**
+   - Follow existing patterns
+   - Use CONSTANTS for configuration
+   - Add test data to aa-testData.js
+   - Document changes in comments
+
+3. **Best Practices**
+   - Use document locks for concurrent access
+   - Handle errors gracefully
+   - Log important operations
+   - Keep functions focused and small
+
+### Deployment
+
+1. **Testing Environment**
    ```bash
    npm run push
+   npm run version
    ```
 
-## Usage
+2. **Production Deployment**
+   ```bash
+   npm run deploy
+   ```
 
-### Scripts
+3. **Rollback if needed**
+   ```bash
+   npm run undeploy
+   ```
 
-The project includes several npm scripts to help manage the Google Apps Script project:
+### Troubleshooting
 
-- **Push Changes**: `npm run push`
-- **Pull Changes**: `npm run pull`
-- **Watch for Changes**: `npm run watch`
-- **Open in Browser**: `npm run open`
-- **Deploy**: `npm run deploy`
-- **Undeploy**: `npm run undeploy`
-- **Create Version**: `npm run version`
-- **View Logs**: `npm run logs`
+Common issues and solutions:
 
-### Testing
+1. **Authentication Issues**
+   - Re-run `clasp login`
+   - Check OAuth credentials
+   - Verify API access
 
-To test the `doPost` function, you can use the predefined testing data. Ensure `TESTING_MODE` is set to `true` in `Code.js` and then run:
+2. **Push Failures**
+   - Check .clasp.json configuration
+   - Verify file permissions
+   - Clear clasp cache if needed
 
-```bash
-npm run test
-```
+3. **Runtime Errors**
+   - Enable DEBUG_MODE
+   - Check logs: `npm run logs`
+   - Verify sheet names and IDs
 
-## Project Structure
+### Contributing
 
-- **Code.js**: Contains the main logic for processing incoming data, moving resolved audits, and sending debug emails.
-- **Menu.js**: Defines the menu items for the Google Sheets UI.
-- **aa-testData.js**: Contains predefined testing data for the `doPost` function.
-- **appsscript.json**: Configuration file for the Google Apps Script project.
-- **.clasp.json**: Configuration file for Google Clasp.
+1. **Development Process**
+   - Fork the repository
+   - Create a feature branch
+   - Make changes
+   - Add tests
+   - Submit pull request
 
-## Contributing
+2. **Code Standards**
+   - Use consistent formatting
+   - Add JSDoc comments
+   - Follow existing patterns
+   - Test thoroughly
 
-Contributions are welcome! Please read the [contributing guidelines](CONTRIBUTING.md) before getting started.
+3. **Documentation**
+   - Update README for major changes
+   - Document new features
+   - Include example usage
 
 ## License
 
 This project is licensed under the All Rights Reserved license. See the [LICENSE](LICENSE) file for details.
+
+## Support
+
+For support:
+1. Check existing issues
+2. Review documentation
+3. Create detailed bug reports
+4. Contact maintainers
