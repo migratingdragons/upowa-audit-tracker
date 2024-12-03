@@ -27,10 +27,47 @@ The system consists of several key components:
 
 3. **Data Flow**
    ```
-   Field Audit → POST Request → doPost() → Process Data → Appropriate Sheet
+   Field Audit → POST Request → doPost() → Process Data
                                       ↓
-                              Debug Email (if enabled)
+                              1. Summary Sheet (all audits)
+                              2. Panel/Electrical Sheet (non-compliant only)
+                              3. Debug Email (if enabled)
    ```
+
+### Data Structure and Sheet Organization
+
+#### Summary Sheet
+The Summary sheet (`SUMMARY_SHEET`) contains a consolidated view of all audits with the following columns:
+- `Audit_Date`: Date the audit was performed
+- `Install_date`: Date of the installation
+- `Auditor`: Name of the auditor
+- `Job_Type`: Installation or Electrical
+- `Installer`: Name of the installer
+- `Compliant`: Yes/No indicator
+- `Non_Compliance.Reason`: Description of non-compliance issue
+- `Non_Compliance.Severity`: Severity level of non-compliance
+- `Site`: Installation location
+- `Job_No`: Unique job identifier
+- `Plot_No`: Plot number
+- `Team`: Installation team
+- `Audit_Type`: Type of audit performed
+- `Authorised_for_NC`: Authorization status
+- `Remedial_Required`: Yes/No indicator
+- `Remedial_Details`: Description of required remedial work
+- `Notes`: Additional audit notes
+- `submissionid`: Unique submission identifier
+
+#### Non-compliant Panel Installations Sheet
+The Non-compliant Panel Installations sheet (`PANEL_SHEET`) tracks active issues:
+- `Resolved`: Checkbox to mark when issue is fixed
+- `Comment`: Notes about resolution
+- `Timestamp`: When the record was created
+- All metadata fields from submission (prefixed with "metadata.")
+- All answer fields from submission (prefixed with "answers.")
+
+When an issue is marked as resolved:
+1. The row moves to the Resolved Non-compliant Panel Installations sheet
+2. The timestamp is used to sort resolved issues chronologically
 
 ### Getting Started
 
